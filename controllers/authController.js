@@ -235,9 +235,9 @@ const forgotPassword = async (req, res) => {
     try {
         const { email, securityAnswer, newPassword } = req.body;
         
-        if (!email) {
+        if (!email || !securityAnswer) {
             return res.render('forgot-password', { 
-                error: 'Email is required',
+                error: 'Email and security answer are required',
                 success: null,
                 showSecurityQuestion: false,
                 user: null
@@ -274,64 +274,45 @@ const forgotPassword = async (req, res) => {
             });
         }
         
-        // If security answer is provided, verify it
-        if (securityAnswer) {
-            const isCorrect = await user.compareSecurityAnswer(securityAnswer);
-            if (!isCorrect) {
+        // Verify security answer
+        const isCorrect = await user.compareSecurityAnswer(securityAnswer);
+        if (!isCorrect) {
+            return res.render('forgot-password', { 
+                error: 'Incorrect security answer. Please try again.',
+                success: null,
+                showSecurityQuestion: false,
+                user: null
+            });
+        }
+        
+        // If new password is provided, update it
+        if (newPassword) {
+            if (newPassword.length < 6) {
                 return res.render('forgot-password', { 
-                    error: 'Incorrect security answer. Please try again.',
+                    error: 'New password must be at least 6 characters long.',
                     success: null,
-                    showSecurityQuestion: true,
-                    user: {
-                        email: user.email,
-                        securityQuestion: user.securityQuestion.question
-                    }
-                });
-            }
-            
-            // If new password is provided, update it
-            if (newPassword) {
-                if (newPassword.length < 6) {
-                    return res.render('forgot-password', { 
-                        error: 'New password must be at least 6 characters long.',
-                        success: null,
-                        showSecurityQuestion: true,
-                        user: {
-                            email: user.email,
-                            securityQuestion: user.securityQuestion.question
-                        }
-                    });
-                }
-                
-                user.password = newPassword;
-                await user.save();
-                
-                return res.render('forgot-password', { 
-                    error: null,
-                    success: 'Password has been reset successfully! You can now login with your new password.',
                     showSecurityQuestion: false,
                     user: null
                 });
             }
             
-            // Show password reset form
+            user.password = newPassword;
+            await user.save();
+            
             return res.render('forgot-password', { 
                 error: null,
-                success: null,
-                showSecurityQuestion: true,
-                showPasswordForm: true,
-                user: {
-                    email: user.email,
-                    securityQuestion: user.securityQuestion.question
-                }
+                success: 'Password has been reset successfully! You can now login with your new password.',
+                showSecurityQuestion: false,
+                user: null
             });
         }
         
-        // Show security question
+        // Show password reset form after successful security answer verification
         return res.render('forgot-password', { 
             error: null,
-            success: null,
+            success: 'Security question verified! Please enter your new password.',
             showSecurityQuestion: true,
+            showPasswordForm: true,
             user: {
                 email: user.email,
                 securityQuestion: user.securityQuestion.question
