@@ -11,12 +11,15 @@ const connectDB = async () => {
         const uri = process.env.MONGODB_URI || 'mongodb://localhost:27017/sync-pad';
         console.log('Using URI:', uri.substring(0, 30) + '...');
         
+        // Try connection with more lenient settings
         const conn = await mongoose.connect(uri, {
-            serverSelectionTimeoutMS: 10000, // Increased to 10 seconds
+            serverSelectionTimeoutMS: 30000, // 30 seconds
             socketTimeoutMS: 45000, // Close sockets after 45 seconds of inactivity
-            connectTimeoutMS: 10000, // Connection timeout
+            connectTimeoutMS: 30000, // 30 seconds
             maxPoolSize: 10, // Maintain up to 10 socket connections
-            minPoolSize: 5, // Maintain a minimum of 5 socket connections
+            minPoolSize: 1, // Minimum 1 connection
+            retryWrites: true,
+            w: 'majority'
         });
         console.log(`MongoDB Connected: ${conn.connection.host}`);
         
