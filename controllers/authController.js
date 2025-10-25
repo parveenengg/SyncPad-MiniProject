@@ -80,8 +80,21 @@ const login = async (req, res) => {
         req.session.userName = user.name;
         req.session.userUniqueId = user.uniqueId;
         
-        console.log('Login successful, redirecting to /home');
-        res.redirect('/home');
+        console.log('Login successful, session set:', {
+            userId: req.session.userId,
+            userEmail: req.session.userEmail,
+            userName: req.session.userName
+        });
+        
+        // Save session before redirect
+        req.session.save((err) => {
+            if (err) {
+                console.error('Session save error:', err);
+                return res.render('login', { error: 'Session error. Please try again.' });
+            }
+            console.log('Session saved, redirecting to /home');
+            res.redirect('/home');
+        });
     } catch (error) {
         console.error('Login error details:', {
             message: error.message,
@@ -165,8 +178,21 @@ const signup = async (req, res) => {
         req.session.userName = user.name;
         req.session.userUniqueId = user.uniqueId;
         
-        console.log('Signup successful, redirecting to /home');
-        res.redirect('/home');
+        console.log('Signup successful, session set:', {
+            userId: req.session.userId,
+            userEmail: req.session.userEmail,
+            userName: req.session.userName
+        });
+        
+        // Save session before redirect
+        req.session.save((err) => {
+            if (err) {
+                console.error('Session save error:', err);
+                return res.render('signup', { error: 'Session error. Please try again.' });
+            }
+            console.log('Session saved, redirecting to /home');
+            res.redirect('/home');
+        });
     } catch (error) {
         console.error('Signup error details:', {
             message: error.message,
@@ -192,9 +218,18 @@ const logout = (req, res) => {
 
 // Middleware to check if user is authenticated
 const requireAuth = (req, res, next) => {
+    console.log('requireAuth check:', {
+        hasSession: !!req.session,
+        userId: req.session?.userId,
+        userEmail: req.session?.userEmail,
+        userName: req.session?.userName
+    });
+    
     if (req.session && req.session.userId) {
+        console.log('User authenticated, proceeding to next middleware');
         return next();
     } else {
+        console.log('User not authenticated, redirecting to login');
         res.redirect('/login');
     }
 };
