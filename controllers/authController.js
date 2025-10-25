@@ -43,13 +43,13 @@ const login = async (req, res) => {
         // Find user by email
         const user = await User.findOne({ email });
         if (!user) {
-            return res.render('login', { error: 'No account found with this email. Please sign up first.' });
+            return res.render('login', { error: 'Error: You are not a user' });
         }
         
         // Check password
         const isMatch = await user.comparePassword(password);
         if (!isMatch) {
-            return res.render('login', { error: 'Invalid email or password' });
+            return res.render('login', { error: 'Error: Wrong password' });
         }
         
         // Update last login
