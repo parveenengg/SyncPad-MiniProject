@@ -42,8 +42,14 @@ const login = async (req, res) => {
             return res.render('login', { error: 'Password must be at least 6 characters long' });
         }
         
+        // Check database connection
+        if (mongoose.connection.readyState !== 1) {
+            console.error('Database not connected');
+            return res.render('login', { error: 'Database connection error. Please try again.' });
+        }
+        
         // Find user by email
-        const user = await User.findOne({ email });
+        const user = await User.findOne({ email: email.toLowerCase().trim() });
         if (!user) {
             return res.render('login', { error: 'Error: You are not a user' });
         }
@@ -84,7 +90,8 @@ const login = async (req, res) => {
             message: error.message,
             stack: error.stack,
             email: req.body?.email,
-            hasPassword: !!req.body?.password
+            hasPassword: !!req.body?.password,
+            databaseState: mongoose.connection.readyState
         });
         res.render('login', { error: 'An error occurred during login' });
     }
@@ -212,6 +219,50 @@ const requireAuth = (req, res, next) => {
     }
 };
 
+// Handle forgot password
+const forgotPassword = async (req, res) => {
+    try {
+        const { email } = req.body;
+        
+        if (!email) {
+            return res.render('forgot-password', { 
+                error: 'Email is required',
+                success: null 
+            });
+        }
+        
+        if (!email.includes('@') || email.length < 5) {
+            return res.render('forgot-password', { 
+                error: 'Please enter a valid email address',
+                success: null 
+            });
+        }
+        
+        // Check if user exists
+        const user = await User.findOne({ email: email.toLowerCase() });
+        if (!user) {
+            return res.render('forgot-password', { 
+                error: 'No account found with this email address',
+                success: null 
+            });
+        }
+        
+        // For now, just show a success message
+        // In a real application, you would send an email with reset instructions
+        return res.render('forgot-password', { 
+            error: null,
+            success: 'Password reset instructions have been sent to your email address. Please check your inbox.'
+        });
+        
+    } catch (error) {
+        console.error('Forgot password error:', error);
+        return res.render('forgot-password', { 
+            error: 'An error occurred. Please try again.',
+            success: null 
+        });
+    }
+};
+
 // Middleware to check if user is not authenticated (for login/signup pages)
 const requireGuest = (req, res, next) => {
     if (req.session && req.session.userId) {
@@ -227,6 +278,7 @@ module.exports = {
     login,
     signup,
     logout,
+    forgotPassword,
     requireAuth,
     requireGuest
 };

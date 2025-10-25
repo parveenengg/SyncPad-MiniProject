@@ -7,6 +7,7 @@ const {
     login,
     signup,
     logout,
+    forgotPassword,
     requireAuth,
     requireGuest
 } = require('../controllers/authController');
@@ -36,5 +37,16 @@ router.post('/login', authLimiter, login);
 router.get('/signup', requireGuest, getSignupPage);
 router.post('/signup', authLimiter, signup);
 router.get('/logout', logout);
+
+// Forgot password route
+router.get('/forgot-password', (req, res) => {
+    res.render('forgot-password', { error: null, success: null });
+});
+router.post('/forgot-password', authLimiter, forgotPassword);
+
+// Admin login redirect (for backward compatibility)
+router.get('/login-admin', (req, res) => {
+    res.redirect('/admin');
+});
 
 module.exports = router;
