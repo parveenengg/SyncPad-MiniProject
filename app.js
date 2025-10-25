@@ -35,7 +35,7 @@ app.use(session({
     resave: false,
     saveUninitialized: false,
     cookie: {
-        secure: process.env.NODE_ENV === 'production', // Set to true in production with HTTPS
+        secure: false, // Set to false for Vercel compatibility
         httpOnly: true, // Prevent XSS attacks
         maxAge: 24 * 60 * 60 * 1000, // 24 hours
         sameSite: 'lax' // CSRF protection
@@ -46,6 +46,16 @@ app.use(session({
 // Set EJS as view engine
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
+
+// Test session route
+app.get('/test-session', (req, res) => {
+    res.json({
+        sessionId: req.sessionID,
+        sessionData: req.session,
+        hasUserId: !!req.session.userId,
+        userId: req.session.userId
+    });
+});
 
 
 // Routes
