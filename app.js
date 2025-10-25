@@ -3,6 +3,7 @@ const express = require('express');
 const path = require('path');
 const session = require('express-session');
 const rateLimit = require('express-rate-limit');
+const mongoose = require('mongoose');
 const connectDB = require('./config/database');
 const noteRoutes = require('./routes/noteRoutes');
 const authRoutes = require('./routes/authRoutes');
@@ -45,6 +46,62 @@ app.use(session({
 // Set EJS as view engine
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
+
+// Debug route for database connection
+app.get('/debug', (req, res) => {
+    const debugInfo = {
+        mongodbUri: process.env.MONGODB_URI ? 'SET' : 'NOT SET',
+        mongodbUriLength: process.env.MONGODB_URI ? process.env.MONGODB_URI.length : 0,
+        mongodbUriStart: process.env.MONGODB_URI ? process.env.MONGODB_URI.substring(0, 30) + '...' : 'NOT SET',
+        connectionState: mongoose.connection.readyState,
+        connectionStates: {
+            0: 'disconnected',
+            1: 'connected',
+            2: 'connecting',
+            3: 'disconnecting'
+        },
+        nodeEnv: process.env.NODE_ENV,
+        sessionSecret: process.env.SESSION_SECRET ? 'SET' : 'NOT SET'
+    };
+    
+    res.json(debugInfo);
+});
+
+// Test database connection route
+app.get('/test-db', async (req, res) => {
+    try {
+        console.log('Testing database connection...');
+        
+        // Try to connect if not already connected
+        if (mongoose.connection.readyState !== 1) {
+            await mongoose.connect(process.env.MONGODB_URI, {
+                serverSelectionTimeoutMS: 10000,
+                connectTimeoutMS: 10000,
+            });
+        }
+        
+        // Test a simple operation
+        const collections = await mongoose.connection.db.listCollections().toArray();
+        
+        res.json({
+            status: 'success',
+            message: 'Database connection successful',
+            connectionState: mongoose.connection.readyState,
+            collections: collections.map(c => c.name),
+            host: mongoose.connection.host
+        });
+        
+    } catch (error) {
+        console.error('Database test failed:', error);
+        res.json({
+            status: 'error',
+            message: error.message,
+            code: error.code,
+            name: error.name,
+            connectionState: mongoose.connection.readyState
+        });
+    }
+});
 
 // Routes
 app.use('/', authRoutes);
