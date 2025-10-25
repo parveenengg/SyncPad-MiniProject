@@ -3,6 +3,9 @@ const express = require('express');
 const path = require('path');
 const session = require('express-session');
 const rateLimit = require('express-rate-limit');
+const helmet = require('helmet');
+const compression = require('compression');
+const morgan = require('morgan');
 const mongoose = require('mongoose');
 const connectDB = require('./config/database');
 const noteRoutes = require('./routes/noteRoutes');
@@ -24,27 +27,80 @@ const limiter = rateLimit({
     message: 'Too many requests from this IP, please try again later.'
 });
 
-// Middleware
+// Security middleware
+app.use(helmet({
+    contentSecurityPolicy: {
+        directives: {
+            defaultSrc: ["'self'"],
+            styleSrc: ["'self'", "'unsafe-inline'"],
+            scriptSrc: ["'self'"],
+            imgSrc: ["'self'", "data:", "https:"],
+            connectSrc: ["'self'"],
+            fontSrc: ["'self'"],
+            objectSrc: ["'none'"],
+            mediaSrc: ["'self'"],
+            frameSrc: ["'none'"],
+        },
+    },
+    crossOriginEmbedderPolicy: false
+}));
+
+// Compression middleware
+app.use(compression());
+
+// Logging middleware
+if (process.env.NODE_ENV === 'production') {
+    app.use(morgan('combined'));
+} else {
+    app.use(morgan('dev'));
+}
+
+// Rate limiting
 app.use(limiter);
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
+
+// Body parsing middleware
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+app.use(express.json({ limit: '10mb' }));
+
+// Static files
 app.use(express.static('public'));
 
 // Session middleware
 app.use(session({
-    secret: process.env.SESSION_SECRET || 'syncpad-secret-key',
+    secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
     cookie: {
-        secure: false,
+        secure: process.env.NODE_ENV === 'production',
         httpOnly: true,
-        maxAge: 24 * 60 * 60 * 1000 // 24 hours
+        maxAge: 24 * 60 * 60 * 1000, // 24 hours
+        sameSite: 'strict'
     }
 }));
 
 // Set EJS as view engine
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
+
+// Health check endpoint
+app.get('/health', (req, res) => {
+    res.status(200).json({
+        status: 'OK',
+        timestamp: new Date().toISOString(),
+        uptime: process.uptime(),
+        environment: process.env.NODE_ENV || 'development'
+    });
+});
+
+// API status endpoint
+app.get('/api/status', (req, res) => {
+    res.json({
+        service: 'SyncPad API',
+        version: '1.0.0',
+        status: 'operational',
+        timestamp: new Date().toISOString()
+    });
+});
 
 // Routes
 app.use('/', authRoutes);

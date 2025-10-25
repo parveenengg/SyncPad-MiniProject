@@ -12,8 +12,12 @@ yarn-error.log*
 .env.production.local
 
 # Logs
-logs
+logs/
 *.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
 
 # Runtime data
 pids
@@ -23,15 +27,20 @@ pids
 
 # Coverage directory used by tools like istanbul
 coverage/
+*.lcov
 
 # nyc test coverage
 .nyc_output
 
 # Dependency directories
+node_modules/
 jspm_packages/
 
 # Optional npm cache directory
 .npm
+
+# Optional eslint cache
+.eslintcache
 
 # Optional REPL history
 .node_repl_history
@@ -45,11 +54,30 @@ jspm_packages/
 # dotenv environment variables file
 .env
 
-# IDE files
-.vscode/
-.idea/
-*.swp
-*.swo
+# parcel-bundler cache (https://parceljs.org/)
+.cache
+.parcel-cache
+
+# next.js build output
+.next
+
+# nuxt.js build output
+.nuxt
+
+# vuepress build output
+.vuepress/dist
+
+# Serverless directories
+.serverless
+
+# FuseBox cache
+.fusebox/
+
+# DynamoDB Local files
+.dynamodb/
+
+# TernJS port file
+.tern-port
 
 # OS generated files
 .DS_Store
@@ -60,11 +88,13 @@ jspm_packages/
 ehthumbs.db
 Thumbs.db
 
-# Temporary files
-*.tmp
-*.temp
-cookies.txt
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
 
-# Build directories
+# Build outputs
 dist/
 build/
