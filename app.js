@@ -7,14 +7,6 @@ const mongoose = require('mongoose');
 const connectDB = require('./config/database');
 const noteRoutes = require('./routes/noteRoutes');
 const authRoutes = require('./routes/authRoutes');
-const profileRoutes = require('./routes/profileRoutes');
-const spectatorRoutes = require('./routes/spectatorRoutes');
-const adminRoutes = require('./routes/adminRoutes');
-const { errorHandler } = require('./middleware/errorHandler');
-const logger = require('./utils/logger');
-
-// Import message routes
-const messageRoutes = require('./routes/messageRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 3330;
@@ -54,10 +46,6 @@ app.set('views', path.join(__dirname, 'views'));
 // Routes
 app.use('/', authRoutes);
 app.use('/', noteRoutes);
-app.use('/', profileRoutes);
-app.use('/', spectatorRoutes);
-app.use('/admin', adminRoutes);
-app.use('/api/messages', messageRoutes);
 
 // 404 handler
 app.use((req, res) => {
@@ -70,8 +58,17 @@ app.use((req, res) => {
     });
 });
 
-// Global error handler
-app.use(errorHandler);
+// Simple error handler
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).render('error', { 
+        error: 'Something went wrong!',
+        user: req.session ? {
+            name: req.session.userName,
+            email: req.session.userEmail
+        } : null
+    });
+});
 
 // Start server
 app.listen(PORT, () => {
