@@ -37,6 +37,15 @@
                 <div class="text-right">
                     <div class="text-sm text-gray-600">Welcome, <%= user.name %></div>
                 </div>
+                
+                <!-- Request Icon (Circular) -->
+                <div class="relative">
+                    <button onclick="toggleRequests()" class="w-10 h-10 bg-gradient-to-r from-orange-500 to-red-500 rounded-full flex items-center justify-center text-white text-lg font-bold hover:from-orange-600 hover:to-red-600 transition-all duration-300 shadow-lg hover:shadow-xl" style="border-radius: 50%;">
+                        <i class="ri-notification-line"></i>
+                    </button>
+                    <span id="requestBadgeNav" class="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center hidden">!</span>
+                </div>
+                
                 <!-- Profile Icon -->
                 <div class="relative">
                     <button onclick="toggleProfile()" class="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-lg font-bold hover:from-blue-600 hover:to-purple-700 transition-all duration-300 shadow-lg hover:shadow-xl" style="border-radius: 50%;">
@@ -95,6 +104,14 @@
             <div class="flex flex-col items-center">
                 <a href="/home" class="text-xl tracking-tight logo">SyncPad</a>
                 <span class="text-xs text-gray-500 font-light">Mini Project</span>
+            </div>
+            
+            <!-- Request Icon (Mobile) -->
+            <div class="relative mr-2">
+                <button onclick="toggleRequests()" class="w-10 h-10 bg-gradient-to-r from-orange-500 to-red-500 rounded-full flex items-center justify-center text-white text-lg font-bold hover:from-orange-600 hover:to-red-600 transition-all duration-300 shadow-lg hover:shadow-xl" style="border-radius: 50%;">
+                    <i class="ri-notification-line"></i>
+                </button>
+                <span id="requestBadgeNavMobile" class="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center hidden">!</span>
             </div>
             
             <!-- Profile Picture (Top-Right) -->
@@ -247,13 +264,13 @@
                     <div class="flex items-center justify-between mb-6">
                         <h2 class="text-xl font-semibold text-gray-800">Requests & Messages</h2>
                         <div class="flex gap-2">
-                            <button class="p-2 text-blue-600 hover:bg-blue-50 rounded-md transition-colors relative" onclick="toggleRequests()">
+                            <button id="requestsBtn" class="p-2 text-blue-600 hover:bg-blue-50 rounded-md transition-colors relative" onclick="toggleRequests()">
                                 <i class="ri-notification-line"></i>
-                                <span class="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></span>
+                                <span id="requestBadge" class="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full hidden"></span>
                             </button>
-                            <button class="p-2 text-green-600 hover:bg-green-50 rounded-md transition-colors relative" onclick="toggleMessages()">
+                            <button id="messagesBtn" class="p-2 text-green-600 hover:bg-green-50 rounded-md transition-colors relative" onclick="toggleMessages()">
                                 <i class="ri-message-3-line"></i>
-                                <span class="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full"></span>
+                                <span id="messageBadge" class="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full hidden"></span>
                             </button>
                         </div>
                     </div>
@@ -261,7 +278,7 @@
                     <!-- New Requests Section -->
                     <div id="requestsSection" class="mb-6">
                         <h3 class="text-lg font-medium text-gray-700 mb-3">New Requests</h3>
-                        <div class="space-y-3">
+                        <div class="space-y-3" id="requestsList">
                             <!-- Empty state for requests -->
                             <div class="text-center py-6 text-gray-500">
                                 <i class="ri-inbox-line text-2xl mb-2 block"></i>
@@ -280,24 +297,32 @@
                                 </button>
                             </div>
                             
+                            <!-- User Selection for Messaging -->
+                            <div class="mb-4">
+                                <select id="messageUserSelect" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500" onchange="selectMessageUser()">
+                                    <option value="">Select a user to message...</option>
+                                </select>
+                            </div>
+                            
                             <!-- Messages List -->
-                            <div class="space-y-2 mb-4 max-h-48 overflow-y-auto">
-                                <div class="p-2 bg-blue-50 rounded-lg">
-                                    <div class="text-sm text-gray-800">Hello! How are you doing?</div>
-                                    <div class="text-xs text-gray-500 mt-1">2 minutes ago</div>
-                                </div>
-                                <div class="p-2 bg-gray-50 rounded-lg">
-                                    <div class="text-sm text-gray-800">Great! Working on the new project.</div>
-                                    <div class="text-xs text-gray-500 mt-1">1 hour ago</div>
+                            <div id="messagesList" class="space-y-2 mb-4 max-h-48 overflow-y-auto">
+                                <div class="text-center py-6 text-gray-500">
+                                    <i class="ri-message-3-line text-2xl mb-2 block"></i>
+                                    <p class="text-sm">Select a user to start messaging</p>
                                 </div>
                             </div>
                             
                             <!-- Message Input -->
-                            <div class="flex gap-2">
-                                <input type="text" placeholder="Type a message..." class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500">
-                                <button class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors">
-                                    <i class="ri-send-plane-line"></i>
-                                </button>
+                            <div id="messageInputContainer" class="hidden">
+                                <div class="mb-2">
+                                    <input type="text" id="messageTitle" placeholder="Message title (optional)" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500 mb-2">
+                                </div>
+                                <div class="flex gap-2">
+                                    <textarea id="messageContent" placeholder="Type your mini note..." class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500 resize-none" rows="2"></textarea>
+                                    <button onclick="sendMessage()" class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors">
+                                        <i class="ri-send-plane-line"></i>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -391,14 +416,252 @@
             document.getElementById('messagingInterface').classList.add('hidden');
         }
 
+        // Global variables for messaging
+        let currentMessageUser = null;
+        let messagingUsers = [];
+        let unreadCount = 0;
+
+        // Initialize messaging system
+        document.addEventListener('DOMContentLoaded', function() {
+            loadMessagingUsers();
+            loadUnreadCount();
+            updateRequestBadge();
+            setInterval(loadUnreadCount, 30000); // Check for new messages every 30 seconds
+            setInterval(updateRequestBadge, 60000); // Check for requests every minute
+        });
+
         // Toggle requests
         function toggleRequests() {
-            alert('Toggle requests functionality');
+            const requestsSection = document.getElementById('requestsSection');
+            const messagingInterface = document.getElementById('messagingInterface');
+            const requestsBtn = document.getElementById('requestsBtn');
+            const messagesBtn = document.getElementById('messagesBtn');
+            
+            // Show requests, hide messaging
+            requestsSection.classList.remove('hidden');
+            messagingInterface.classList.add('hidden');
+            
+            // Update button states
+            requestsBtn.classList.add('bg-blue-50');
+            messagesBtn.classList.remove('bg-green-50');
         }
 
         // Toggle messages
         function toggleMessages() {
-            alert('Toggle messages functionality');
+            const requestsSection = document.getElementById('requestsSection');
+            const messagingInterface = document.getElementById('messagingInterface');
+            const requestsBtn = document.getElementById('requestsBtn');
+            const messagesBtn = document.getElementById('messagesBtn');
+            
+            // Hide requests, show messaging
+            requestsSection.classList.add('hidden');
+            messagingInterface.classList.remove('hidden');
+            
+            // Update button states
+            messagesBtn.classList.add('bg-green-50');
+            requestsBtn.classList.remove('bg-blue-50');
+            
+            // Load conversations if not already loaded
+            if (messagingUsers.length === 0) {
+                loadMessagingUsers();
+            }
+        }
+
+        // Load users available for messaging
+        async function loadMessagingUsers() {
+            try {
+                const response = await fetch('/api/messages/users');
+                const data = await response.json();
+                
+                if (data.users) {
+                    messagingUsers = data.users;
+                    populateUserSelect();
+                }
+            } catch (error) {
+                console.error('Error loading messaging users:', error);
+                showNotification('Error loading users', 'error');
+            }
+        }
+
+        // Populate user select dropdown
+        function populateUserSelect() {
+            const select = document.getElementById('messageUserSelect');
+            select.innerHTML = '<option value="">Select a user to message...</option>';
+            
+            messagingUsers.forEach(user => {
+                const option = document.createElement('option');
+                option.value = user._id;
+                option.textContent = `${user.name} (${user.email})`;
+                select.appendChild(option);
+            });
+        }
+
+        // Select a user for messaging
+        function selectMessageUser() {
+            const select = document.getElementById('messageUserSelect');
+            const userId = select.value;
+            
+            if (userId) {
+                currentMessageUser = userId;
+                loadMessages(userId);
+                document.getElementById('messageInputContainer').classList.remove('hidden');
+            } else {
+                currentMessageUser = null;
+                document.getElementById('messagesList').innerHTML = `
+                    <div class="text-center py-6 text-gray-500">
+                        <i class="ri-message-3-line text-2xl mb-2 block"></i>
+                        <p class="text-sm">Select a user to start messaging</p>
+                    </div>
+                `;
+                document.getElementById('messageInputContainer').classList.add('hidden');
+            }
+        }
+
+        // Load messages for a specific user
+        async function loadMessages(userId) {
+            try {
+                const response = await fetch(`/api/messages/messages/${userId}`);
+                const data = await response.json();
+                
+                if (data.messages) {
+                    displayMessages(data.messages);
+                }
+            } catch (error) {
+                console.error('Error loading messages:', error);
+                showNotification('Error loading messages', 'error');
+            }
+        }
+
+        // Display messages in the chat area
+        function displayMessages(messages) {
+            const messagesList = document.getElementById('messagesList');
+            
+            if (messages.length === 0) {
+                messagesList.innerHTML = `
+                    <div class="text-center py-6 text-gray-500">
+                        <i class="ri-message-3-line text-2xl mb-2 block"></i>
+                        <p class="text-sm">No messages yet. Start the conversation!</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            messagesList.innerHTML = messages.map(message => {
+                const currentUserId = '<%= user._id || "current-user" %>';
+                const isOwnMessage = message.sender._id === currentUserId;
+                const messageClass = isOwnMessage ? 'bg-blue-50 ml-4' : 'bg-gray-50 mr-4';
+                const timeAgo = getTimeAgo(new Date(message.createdAt));
+                
+                return `
+                    <div class="p-3 ${messageClass} rounded-lg">
+                        ${message.title ? `<div class="font-medium text-sm text-gray-800 mb-1">${message.title}</div>` : ''}
+                        <div class="text-sm text-gray-800">${message.content}</div>
+                        <div class="text-xs text-gray-500 mt-1">${timeAgo}</div>
+                    </div>
+                `;
+            }).join('');
+            
+            // Scroll to bottom
+            messagesList.scrollTop = messagesList.scrollHeight;
+        }
+
+        // Send a message
+        async function sendMessage() {
+            if (!currentMessageUser) {
+                showNotification('Please select a user first', 'error');
+                return;
+            }
+            
+            const title = document.getElementById('messageTitle').value.trim();
+            const content = document.getElementById('messageContent').value.trim();
+            
+            if (!content) {
+                showNotification('Please enter a message', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/messages/send', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        receiverId: currentMessageUser,
+                        title: title,
+                        content: content
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Clear input fields
+                    document.getElementById('messageTitle').value = '';
+                    document.getElementById('messageContent').value = '';
+                    
+                    // Reload messages
+                    loadMessages(currentMessageUser);
+                    showNotification('Message sent!', 'success');
+                } else {
+                    showNotification(data.error || 'Error sending message', 'error');
+                }
+            } catch (error) {
+                console.error('Error sending message:', error);
+                showNotification('Error sending message', 'error');
+            }
+        }
+
+        // Load unread message count
+        async function loadUnreadCount() {
+            try {
+                const response = await fetch('/api/messages/unread-count');
+                const data = await response.json();
+                
+                if (data.unreadCount !== undefined) {
+                    unreadCount = data.unreadCount;
+                    updateMessageBadge();
+                }
+            } catch (error) {
+                console.error('Error loading unread count:', error);
+            }
+        }
+
+        // Update message badge
+        function updateMessageBadge() {
+            const badge = document.getElementById('messageBadge');
+            if (unreadCount > 0) {
+                badge.classList.remove('hidden');
+                badge.textContent = unreadCount > 9 ? '9+' : unreadCount;
+            } else {
+                badge.classList.add('hidden');
+            }
+        }
+
+        // Update request badge (for demo purposes - you can implement actual request logic)
+        function updateRequestBadge() {
+            const badge = document.getElementById('requestBadgeNav');
+            const badgeMobile = document.getElementById('requestBadgeNavMobile');
+            const hasRequests = Math.random() > 0.7; // Demo: random requests
+            
+            if (hasRequests) {
+                badge.classList.remove('hidden');
+                badgeMobile.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
+                badgeMobile.classList.add('hidden');
+            }
+        }
+
+        // Get time ago string
+        function getTimeAgo(date) {
+            const now = new Date();
+            const diffInSeconds = Math.floor((now - date) / 1000);
+            
+            if (diffInSeconds < 60) return 'Just now';
+            if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m ago`;
+            if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}h ago`;
+            return `${Math.floor(diffInSeconds / 86400)}d ago`;
         }
 
         // Accept request

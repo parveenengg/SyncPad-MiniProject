@@ -7,6 +7,7 @@ const mongoose = require('mongoose');
 const connectDB = require('./config/database');
 const noteRoutes = require('./routes/noteRoutes');
 const authRoutes = require('./routes/authRoutes');
+const messageRoutes = require('./routes/messageRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 3330;
@@ -61,6 +62,7 @@ app.get('/test-session', (req, res) => {
 // Routes
 app.use('/', authRoutes);
 app.use('/', noteRoutes);
+app.use('/api/messages', messageRoutes);
 
 // 404 handler
 app.use((req, res) => {
