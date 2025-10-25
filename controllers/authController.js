@@ -44,8 +44,14 @@ const login = async (req, res) => {
         
         // Check database connection
         if (mongoose.connection.readyState !== 1) {
-            console.error('Database not connected');
-            return res.render('login', { error: 'Database connection error. Please try again.' });
+            console.error('Database not connected, attempting to reconnect...');
+            try {
+                await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/sync-pad');
+                console.log('Database reconnected successfully');
+            } catch (dbError) {
+                console.error('Database reconnection failed:', dbError);
+                return res.render('login', { error: 'Database connection error. Please try again.' });
+            }
         }
         
         // Find user by email
@@ -65,7 +71,7 @@ const login = async (req, res) => {
         await user.save();
         
         // Set session
-        req.session.userId = user._id;
+        req.session.userId = user._id.toString();
         req.session.userEmail = user.email;
         req.session.userName = user.name;
         req.session.userUniqueId = user.uniqueId;
@@ -76,7 +82,7 @@ const login = async (req, res) => {
             userName: req.session.userName
         });
         
-        // Save session before redirect
+        // Force session save and redirect
         req.session.save((err) => {
             if (err) {
                 console.error('Session save error:', err);
