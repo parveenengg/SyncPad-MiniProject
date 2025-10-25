@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const User = require('../models/User');
 const Note = require('../models/Note');
 
@@ -25,6 +26,7 @@ const getSignupPage = (req, res) => {
 const login = async (req, res) => {
     try {
         console.log('Login attempt:', { email: req.body.email, hasPassword: !!req.body.password });
+        console.log('MongoDB connection state:', mongoose.connection.readyState);
         const { email, password } = req.body;
         
         // Input validation
@@ -65,7 +67,12 @@ const login = async (req, res) => {
         console.log('Login successful, redirecting to /home');
         res.redirect('/home');
     } catch (error) {
-        console.error('Login error:', error);
+        console.error('Login error details:', {
+            message: error.message,
+            stack: error.stack,
+            email: req.body?.email,
+            hasPassword: !!req.body?.password
+        });
         res.render('login', { error: 'An error occurred during login' });
     }
 };
@@ -128,7 +135,13 @@ const signup = async (req, res) => {
         console.log('Signup successful, redirecting to /home');
         res.redirect('/home');
     } catch (error) {
-        console.error('Signup error:', error);
+        console.error('Signup error details:', {
+            message: error.message,
+            stack: error.stack,
+            email: req.body?.email,
+            hasPassword: !!req.body?.password,
+            name: req.body?.name
+        });
         res.render('signup', { error: 'An error occurred during signup' });
     }
 };
