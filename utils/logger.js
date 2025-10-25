@@ -3,13 +3,22 @@ const path = require('path');
 
 class Logger {
     constructor() {
+        // Only create logs directory in non-serverless environments
         this.logDir = path.join(__dirname, '../logs');
-        this.ensureLogDirectory();
+        this.isServerless = process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME || process.env.FUNCTION_NAME;
+        
+        if (!this.isServerless) {
+            this.ensureLogDirectory();
+        }
     }
 
     ensureLogDirectory() {
-        if (!fs.existsSync(this.logDir)) {
-            fs.mkdirSync(this.logDir, { recursive: true });
+        try {
+            if (!fs.existsSync(this.logDir)) {
+                fs.mkdirSync(this.logDir, { recursive: true });
+            }
+        } catch (error) {
+            console.warn('Could not create logs directory:', error.message);
         }
     }
 
@@ -29,8 +38,17 @@ class Logger {
     }
 
     writeToFile(filename, logEntry) {
-        const logPath = path.join(this.logDir, filename);
-        fs.appendFileSync(logPath, logEntry + '\n');
+        // Only write to file in non-serverless environments
+        if (this.isServerless) {
+            return; // Skip file writing in serverless environments
+        }
+        
+        try {
+            const logPath = path.join(this.logDir, filename);
+            fs.appendFileSync(logPath, logEntry + '\n');
+        } catch (error) {
+            console.warn('Could not write to log file:', error.message);
+        }
     }
 
     info(message, metadata = {}) {
