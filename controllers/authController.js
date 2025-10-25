@@ -28,12 +28,19 @@ const login = async (req, res) => {
         console.log('Login attempt:', { email: req.body.email, hasPassword: !!req.body.password });
         console.log('MongoDB connection state:', mongoose.connection.readyState);
         
-        // Check if database is connected
+        // Ensure database is connected
         if (mongoose.connection.readyState !== 1) {
-            console.error('Database not connected. State:', mongoose.connection.readyState);
-            console.error('MONGODB_URI exists:', !!process.env.MONGODB_URI);
-            console.error('MONGODB_URI value:', process.env.MONGODB_URI ? 'SET' : 'NOT SET');
-            return res.render('login', { error: 'Database connection error. Please try again.' });
+            console.log('Database not connected, attempting to connect...');
+            try {
+                await mongoose.connect(process.env.MONGODB_URI, {
+                    serverSelectionTimeoutMS: 10000,
+                    connectTimeoutMS: 10000,
+                });
+                console.log('Database connected successfully');
+            } catch (error) {
+                console.error('Failed to connect to database:', error);
+                return res.render('login', { error: 'Database connection error. Please try again.' });
+            }
         }
         
         const { email, password } = req.body;
@@ -92,12 +99,19 @@ const signup = async (req, res) => {
         console.log('Signup attempt:', { email: req.body.email, hasPassword: !!req.body.password, name: req.body.name });
         console.log('MongoDB connection state:', mongoose.connection.readyState);
         
-        // Check if database is connected
+        // Ensure database is connected
         if (mongoose.connection.readyState !== 1) {
-            console.error('Database not connected. State:', mongoose.connection.readyState);
-            console.error('MONGODB_URI exists:', !!process.env.MONGODB_URI);
-            console.error('MONGODB_URI value:', process.env.MONGODB_URI ? 'SET' : 'NOT SET');
-            return res.render('signup', { error: 'Database connection error. Please try again.' });
+            console.log('Database not connected, attempting to connect...');
+            try {
+                await mongoose.connect(process.env.MONGODB_URI, {
+                    serverSelectionTimeoutMS: 10000,
+                    connectTimeoutMS: 10000,
+                });
+                console.log('Database connected successfully');
+            } catch (error) {
+                console.error('Failed to connect to database:', error);
+                return res.render('signup', { error: 'Database connection error. Please try again.' });
+            }
         }
         
         const { email, password, name } = req.body;

@@ -36,6 +36,17 @@ const connectDB = async () => {
             console.log('MongoDB reconnected');
         });
         
+        // Wait for connection to be ready
+        await new Promise((resolve) => {
+            if (mongoose.connection.readyState === 1) {
+                resolve();
+            } else {
+                mongoose.connection.once('open', resolve);
+            }
+        });
+        
+        console.log('MongoDB connection is ready for use');
+        
     } catch (error) {
         console.error('Database connection error:', error);
         console.error('Error details:', {
