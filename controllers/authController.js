@@ -83,6 +83,11 @@ const login = async (req, res) => {
                 return res.render('login', { error: 'Session error. Please try again.' });
             }
             console.log('Session saved, redirecting to /home');
+            console.log('Session data before redirect:', {
+                userId: req.session.userId,
+                userEmail: req.session.userEmail,
+                userName: req.session.userName
+            });
             res.redirect('/home');
         });
     } catch (error) {
