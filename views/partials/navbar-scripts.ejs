@@ -1,0 +1,53 @@
+<script>
+    // Desktop Profile dropdown toggle
+    function toggleProfile() {
+        const dropdown = document.getElementById('profileDropdown');
+        dropdown.classList.toggle('hidden');
+    }
+
+    // Mobile Profile dropdown toggle
+    function toggleMobileProfile() {
+        const dropdown = document.getElementById('mobileProfileDropdown');
+        dropdown.classList.toggle('hidden');
+    }
+
+    // Mobile Menu toggle
+    function toggleMobileMenu() {
+        const menu = document.getElementById('mobileMenu');
+        const menuIcon = document.getElementById('menuIcon');
+        
+        menu.classList.toggle('hidden');
+        
+        if (menu.classList.contains('hidden')) {
+            menuIcon.className = 'ri-menu-line text-2xl';
+        } else {
+            menuIcon.className = 'ri-close-line text-2xl';
+        }
+    }
+
+    // Close dropdowns when clicking outside
+    document.addEventListener('click', function(event) {
+        const profileButton = event.target.closest('button[onclick="toggleProfile()"]');
+        const mobileProfileButton = event.target.closest('button[onclick="toggleMobileProfile()"]');
+        const profileDropdown = document.getElementById('profileDropdown');
+        const mobileProfileDropdown = document.getElementById('mobileProfileDropdown');
+        
+        if (!profileButton && !profileDropdown.contains(event.target)) {
+            profileDropdown.classList.add('hidden');
+        }
+        
+        if (!mobileProfileButton && !mobileProfileDropdown.contains(event.target)) {
+            mobileProfileDropdown.classList.add('hidden');
+        }
+    });
+
+    // Edit profile function
+    function editProfile() {
+        alert('Edit Profile functionality will be implemented here');
+    }
+
+    // Change password function
+    function changePassword() {
+        alert('Change Password functionality will be implemented here');
+    }
+</script>

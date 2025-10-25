@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Collaborators - SyncPad</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body>
+    <main class="w-full h-screen bg-zinc-100 font-['Helvetica']">
+        <!-- Desktop Navigation -->
+        <nav class="hidden md:flex px-10 justify-between items-center py-5">
+            <!-- Section 1: Project Name (Top-Left) -->
+            <div class="flex items-center gap-4">
+                <a href="/home" class="text-2xl tracking-tight logo">SyncPad</a>
+                <span class="text-sm text-gray-500 font-light">Mini Project</span>
+            </div>
+            
+            <!-- Section 2: Home/Dashboard (Top-Center) -->
+            <div class="flex items-center gap-4">
+                <a href="/home" class="px-4 py-2 text-gray-700 hover:text-blue-600 transition-colors font-medium">
+                    <i class="ri-home-line mr-2"></i>
+                    Home
+                </a>
+                <a href="/collaborators" class="px-4 py-2 text-blue-600 font-medium flex items-center gap-2">
+                    <i class="ri-dashboard-line"></i>
+                    Collaborators
+                </a>
+            </div>
+            
+            <!-- Section 3: Profile (Top-Right) -->
+            <div class="flex items-center gap-3">
+                <div class="text-right">
+                    <div class="text-sm text-gray-600">Welcome, <%= user.name %></div>
+                </div>
+                <!-- Profile Icon -->
+                <div class="relative">
+                    <button onclick="toggleProfile()" class="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-lg font-bold hover:from-blue-600 hover:to-purple-700 transition-all duration-300 shadow-lg hover:shadow-xl" style="border-radius: 50%;">
+                        <%= user.name.charAt(0).toUpperCase() %>
+                    </button>
+                    
+                    <!-- Profile Dropdown -->
+                    <div id="profileDropdown" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50">
+                        <div class="bg-white h-full w-full p-6">
+                            <div class="flex justify-between items-center mb-8">
+                                <h2 class="text-2xl font-bold text-gray-800">Profile</h2>
+                                <button onclick="toggleProfile()" class="p-2 text-gray-700 hover:text-blue-600 transition-colors">
+                                    <i class="ri-close-line text-2xl"></i>
+                                </button>
+                            </div>
+                            
+                            <div class="flex items-center gap-4 mb-8">
+                                <div class="w-20 h-20 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-3xl font-bold" style="border-radius: 50%;">
+                                    <%= user.name.charAt(0).toUpperCase() %>
+                                </div>
+                                <div>
+                                    <h3 class="text-2xl font-semibold text-gray-800"><%= user.name %></h3>
+                                    <p class="text-lg text-gray-500"><%= user.email %></p>
+                                </div>
+                            </div>
+                            
+                            <div class="space-y-4">
+                                <button onclick="editProfile()" class="w-full flex items-center gap-3 p-4 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors text-lg">
+                                    <i class="ri-edit-line text-xl"></i>
+                                    Edit Profile
+                                </button>
+                                <button onclick="changePassword()" class="w-full flex items-center gap-3 p-4 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors text-lg">
+                                    <i class="ri-lock-line text-xl"></i>
+                                    Change Password
+                                </button>
+                                <hr class="my-4">
+                                <a href="/logout" class="w-full flex items-center gap-3 p-4 text-red-600 hover:bg-red-50 rounded-lg transition-colors text-lg">
+                                    <i class="ri-logout-box-line text-xl"></i>
+                                    Logout
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Mobile Navigation -->
+        <nav class="md:hidden flex px-4 justify-between items-center py-4">
+            <!-- Mobile Menu Button (Top-Left) -->
+            <button onclick="toggleMobileMenu()" class="p-2 text-gray-700 hover:text-blue-600 transition-colors">
+                <i id="menuIcon" class="ri-menu-line text-2xl"></i>
+            </button>
+            
+            <!-- Project Name (Top-Center) -->
+            <div class="flex flex-col items-center">
+                <a href="/home" class="text-xl tracking-tight logo">SyncPad</a>
+                <span class="text-xs text-gray-500 font-light">Mini Project</span>
+            </div>
+            
+            <!-- Profile Picture (Top-Right) -->
+            <div class="relative">
+                <button onclick="toggleMobileProfile()" class="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-lg font-bold hover:from-blue-600 hover:to-purple-700 transition-all duration-300 shadow-lg hover:shadow-xl" style="border-radius: 50%;">
+                    <%= user.name.charAt(0).toUpperCase() %>
+                </button>
+                
+                <!-- Mobile Profile Dropdown -->
+                <div id="mobileProfileDropdown" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50">
+                    <div class="bg-white h-full w-full p-6">
+                        <div class="flex justify-between items-center mb-8">
+                            <h2 class="text-2xl font-bold text-gray-800">Profile</h2>
+                            <button onclick="toggleMobileProfile()" class="p-2 text-gray-700 hover:text-blue-600 transition-colors">
+                                <i class="ri-close-line text-2xl"></i>
+                            </button>
+                        </div>
+                        
+                        <div class="flex items-center gap-4 mb-8">
+                            <div class="w-20 h-20 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-3xl font-bold" style="border-radius: 50%;">
+                                <%= user.name.charAt(0).toUpperCase() %>
+                            </div>
+                            <div>
+                                <h3 class="text-2xl font-semibold text-gray-800"><%= user.name %></h3>
+                                <p class="text-lg text-gray-500"><%= user.email %></p>
+                            </div>
+                        </div>
+                        
+                        <div class="space-y-4">
+                            <button onclick="editProfile()" class="w-full flex items-center gap-3 p-4 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors text-lg">
+                                <i class="ri-edit-line text-xl"></i>
+                                Edit Profile
+                            </button>
+                            <button onclick="changePassword()" class="w-full flex items-center gap-3 p-4 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors text-lg">
+                                <i class="ri-lock-line text-xl"></i>
+                                Change Password
+                            </button>
+                            <hr class="my-4">
+                            <a href="/logout" class="w-full flex items-center gap-3 p-4 text-red-600 hover:bg-red-50 rounded-lg transition-colors text-lg">
+                                <i class="ri-logout-box-line text-xl"></i>
+                                Logout
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Mobile Menu Overlay -->
+        <div id="mobileMenu" class="md:hidden hidden fixed inset-0 bg-black bg-opacity-50 z-40">
+            <div class="bg-white h-full w-full p-6">
+                <div class="flex justify-between items-center mb-8">
+                    <h2 class="text-2xl font-bold text-gray-800">Menu</h2>
+                    <button onclick="toggleMobileMenu()" class="p-2 text-gray-700 hover:text-blue-600 transition-colors">
+                        <i class="ri-close-line text-2xl"></i>
+                    </button>
+                </div>
+                
+                <div class="space-y-6">
+                    <a href="/home" class="flex items-center gap-3 p-4 hover:bg-gray-50 rounded-lg text-gray-700">
+                        <i class="ri-home-line text-xl"></i>
+                        <span class="text-lg font-medium">Home</span>
+                    </a>
+                    
+                    <a href="/collaborators" class="flex items-center gap-3 p-4 bg-blue-50 rounded-lg text-blue-600">
+                        <i class="ri-dashboard-line text-xl"></i>
+                        <span class="text-lg font-medium">Collaborators</span>
+                    </a>
+                    
+                    <a href="/notes" class="flex items-center gap-3 p-4 hover:bg-gray-50 rounded-lg text-gray-700">
+                        <i class="ri-file-text-line text-xl"></i>
+                        <span class="text-lg font-medium">All Notes</span>
+                    </a>
+                    
+                    <a href="/create" class="flex items-center gap-3 p-4 hover:bg-gray-50 rounded-lg text-gray-700">
+                        <i class="ri-add-line text-xl"></i>
+                        <span class="text-lg font-medium">Create Note</span>
+                    </a>
+                </div>
+                
+                <div class="mt-8 pt-6 border-t">
+                    <div class="flex items-center gap-3 p-4">
+                        <div class="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-lg font-bold" style="border-radius: 50%;">
+                            <%= user.name.charAt(0).toUpperCase() %>
+                        </div>
+                        <div>
+                            <div class="font-medium text-gray-800"><%= user.name %></div>
+                            <div class="text-sm text-gray-500"><%= user.email %></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="px-4 md:px-10 py-6">
+            <!-- Welcome Section -->
+            <div class="mb-8">
+                <h1 class="text-2xl md:text-3xl font-bold text-gray-800 mb-2">Here's your collaborators & Team Members</h1>
+                <p class="text-gray-600">Manage your collaborators and team communications</p>
+            </div>
+
+            <!-- Three Column Layout -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Column 1: Collaborators -->
+                <div class="bg-white rounded-lg shadow-md p-6" id="collaborators-section" ondrop="drop(event, 'collaborators')" ondragover="allowDrop(event)">
+                    <div class="flex items-center justify-between mb-6">
+                        <h2 class="text-xl font-semibold text-gray-800">Collaborators</h2>
+                        <button class="text-blue-600 hover:text-blue-800 transition-colors">
+                            <i class="ri-add-line"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="space-y-4" id="collaborators-list">
+                        <div class="collaborator-card p-4 border border-gray-200 rounded-lg hover:border-blue-300 transition-colors cursor-move" 
+                             draggable="true" 
+                             ondragstart="drag(event)" 
+                             data-user="john"
+                             onclick="selectCollaborator('john')">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 bg-gradient-to-r from-green-400 to-blue-500 rounded-full flex items-center justify-center text-white font-bold" style="border-radius: 50%;">
+                                    J
+                                </div>
+                                <div class="flex-1">
+                                    <h3 class="font-semibold text-gray-800">John Doe</h3>
+                                    <p class="text-sm text-gray-500">john@example.com</p>
+                                </div>
+                                <div class="flex gap-1">
+                                    <button class="p-2 text-blue-600 hover:bg-blue-50 rounded-md transition-colors" onclick="event.stopPropagation(); viewNotes('john')">
+                                        <i class="ri-eye-line"></i>
+                                    </button>
+                                    <button class="p-2 text-green-600 hover:bg-green-50 rounded-md transition-colors" onclick="event.stopPropagation(); startMessaging('john')">
+                                        <i class="ri-message-line"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="collaborator-card p-4 border border-gray-200 rounded-lg hover:border-blue-300 transition-colors cursor-move" 
+                             draggable="true" 
+                             ondragstart="drag(event)" 
+                             data-user="sarah"
+                             onclick="selectCollaborator('sarah')">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 bg-gradient-to-r from-purple-400 to-pink-500 rounded-full flex items-center justify-center text-white font-bold" style="border-radius: 50%;">
+                                    S
+                                </div>
+                                <div class="flex-1">
+                                    <h3 class="font-semibold text-gray-800">Sarah Smith</h3>
+                                    <p class="text-sm text-gray-500">sarah@example.com</p>
+                                </div>
+                                <div class="flex gap-1">
+                                    <button class="p-2 text-blue-600 hover:bg-blue-50 rounded-md transition-colors" onclick="event.stopPropagation(); viewNotes('sarah')">
+                                        <i class="ri-eye-line"></i>
+                                    </button>
+                                    <button class="p-2 text-green-600 hover:bg-green-50 rounded-md transition-colors" onclick="event.stopPropagation(); startMessaging('sarah')">
+                                        <i class="ri-message-line"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Column 2: More Collaborators -->
+                <div class="bg-white rounded-lg shadow-md p-6" id="team-section" ondrop="drop(event, 'team')" ondragover="allowDrop(event)">
+                    <div class="flex items-center justify-between mb-6">
+                        <h2 class="text-xl font-semibold text-gray-800">Team Members</h2>
+                        <span class="text-sm text-gray-500">Active</span>
+                    </div>
+                    
+                    <div class="space-y-4" id="team-list">
+                        <div class="collaborator-card p-4 border border-gray-200 rounded-lg hover:border-blue-300 transition-colors cursor-move" 
+                             draggable="true" 
+                             ondragstart="drag(event)" 
+                             data-user="mike"
+                             onclick="selectCollaborator('mike')">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 bg-gradient-to-r from-orange-400 to-red-500 rounded-full flex items-center justify-center text-white font-bold" style="border-radius: 50%;">
+                                    M
+                                </div>
+                                <div class="flex-1">
+                                    <h3 class="font-semibold text-gray-800">Mike Johnson</h3>
+                                    <p class="text-sm text-gray-500">mike@example.com</p>
+                                </div>
+                                <div class="flex gap-1">
+                                    <button class="p-2 text-blue-600 hover:bg-blue-50 rounded-md transition-colors" onclick="event.stopPropagation(); viewNotes('mike')">
+                                        <i class="ri-eye-line"></i>
+                                    </button>
+                                    <button class="p-2 text-green-600 hover:bg-green-50 rounded-md transition-colors" onclick="event.stopPropagation(); startMessaging('mike')">
+                                        <i class="ri-message-line"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="collaborator-card p-4 border border-gray-200 rounded-lg hover:border-blue-300 transition-colors cursor-move" 
+                             draggable="true" 
+                             ondragstart="drag(event)" 
+                             data-user="alex"
+                             onclick="selectCollaborator('alex')">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 bg-gradient-to-r from-indigo-400 to-purple-500 rounded-full flex items-center justify-center text-white font-bold" style="border-radius: 50%;">
+                                    A
+                                </div>
+                                <div class="flex-1">
+                                    <h3 class="font-semibold text-gray-800">Alex Brown</h3>
+                                    <p class="text-sm text-gray-500">alex@example.com</p>
+                                </div>
+                                <div class="flex gap-1">
+                                    <button class="p-2 text-blue-600 hover:bg-blue-50 rounded-md transition-colors" onclick="event.stopPropagation(); viewNotes('alex')">
+                                        <i class="ri-eye-line"></i>
+                                    </button>
+                                    <button class="p-2 text-green-600 hover:bg-green-50 rounded-md transition-colors" onclick="event.stopPropagation(); startMessaging('alex')">
+                                        <i class="ri-message-line"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Column 3: New Requests & Messaging -->
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <h2 class="text-xl font-semibold text-gray-800">Requests & Messages</h2>
+                        <div class="flex gap-2">
+                            <button class="p-2 text-blue-600 hover:bg-blue-50 rounded-md transition-colors relative" onclick="toggleRequests()">
+                                <i class="ri-notification-line"></i>
+                                <span class="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></span>
+                            </button>
+                            <button class="p-2 text-green-600 hover:bg-green-50 rounded-md transition-colors relative" onclick="toggleMessages()">
+                                <i class="ri-message-3-line"></i>
+                                <span class="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full"></span>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- New Requests Section -->
+                    <div id="requestsSection" class="mb-6">
+                        <h3 class="text-lg font-medium text-gray-700 mb-3">New Requests</h3>
+                        <div class="space-y-3">
+                            <div class="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full flex items-center justify-center text-white text-sm font-bold" style="border-radius: 50%;">
+                                        L
+                                    </div>
+                                    <div class="flex-1">
+                                        <div class="text-sm font-medium text-gray-800">Lisa Wilson</div>
+                                        <div class="text-xs text-gray-500">Wants to collaborate</div>
+                                    </div>
+                                    <div class="flex gap-1">
+                                        <button class="text-green-600 hover:text-green-800 text-sm px-2 py-1 rounded" onclick="acceptRequest('lisa')">
+                                            <i class="ri-check-line"></i>
+                                        </button>
+                                        <button class="text-red-600 hover:text-red-800 text-sm px-2 py-1 rounded" onclick="declineRequest('lisa')">
+                                            <i class="ri-close-line"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Messaging Interface -->
+                    <div id="messagingInterface" class="hidden">
+                        <div class="border-t pt-4">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-lg font-medium text-gray-700" id="messagingTitle">Messages</h3>
+                                <button onclick="closeMessaging()" class="text-gray-500 hover:text-gray-700">
+                                    <i class="ri-close-line"></i>
+                                </button>
+                            </div>
+                            
+                            <!-- Messages List -->
+                            <div class="space-y-2 mb-4 max-h-48 overflow-y-auto">
+                                <div class="p-2 bg-blue-50 rounded-lg">
+                                    <div class="text-sm text-gray-800">Hello! How are you doing?</div>
+                                    <div class="text-xs text-gray-500 mt-1">2 minutes ago</div>
+                                </div>
+                                <div class="p-2 bg-gray-50 rounded-lg">
+                                    <div class="text-sm text-gray-800">Great! Working on the new project.</div>
+                                    <div class="text-xs text-gray-500 mt-1">1 hour ago</div>
+                                </div>
+                            </div>
+                            
+                            <!-- Message Input -->
+                            <div class="flex gap-2">
+                                <input type="text" placeholder="Type a message..." class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500">
+                                <button class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors">
+                                    <i class="ri-send-plane-line"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Desktop Profile dropdown toggle
+        function toggleProfile() {
+            const dropdown = document.getElementById('profileDropdown');
+            dropdown.classList.toggle('hidden');
+        }
+
+        // Mobile Profile dropdown toggle
+        function toggleMobileProfile() {
+            const dropdown = document.getElementById('mobileProfileDropdown');
+            dropdown.classList.toggle('hidden');
+        }
+
+        // Mobile Menu toggle
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobileMenu');
+            const menuIcon = document.getElementById('menuIcon');
+            
+            menu.classList.toggle('hidden');
+            
+            if (menu.classList.contains('hidden')) {
+                menuIcon.className = 'ri-menu-line text-2xl';
+            } else {
+                menuIcon.className = 'ri-close-line text-2xl';
+            }
+        }
+
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', function(event) {
+            const profileButton = event.target.closest('button[onclick="toggleProfile()"]');
+            const mobileProfileButton = event.target.closest('button[onclick="toggleMobileProfile()"]');
+            const profileDropdown = document.getElementById('profileDropdown');
+            const mobileProfileDropdown = document.getElementById('mobileProfileDropdown');
+            
+            if (!profileButton && !profileDropdown.contains(event.target)) {
+                profileDropdown.classList.add('hidden');
+            }
+            
+            if (!mobileProfileButton && !mobileProfileDropdown.contains(event.target)) {
+                mobileProfileDropdown.classList.add('hidden');
+            }
+        });
+
+        // Edit profile function
+        function editProfile() {
+            alert('Edit Profile functionality will be implemented here');
+        }
+
+        // Change password function
+        function changePassword() {
+            alert('Change Password functionality will be implemented here');
+        }
+
+        // Collaborator selection
+        function selectCollaborator(collaboratorId) {
+            // Remove previous selection
+            document.querySelectorAll('.collaborator-card').forEach(card => {
+                card.classList.remove('border-blue-500', 'bg-blue-50');
+                card.classList.add('border-gray-200');
+            });
+            
+            // Add selection to clicked card
+            event.currentTarget.classList.remove('border-gray-200');
+            event.currentTarget.classList.add('border-blue-500', 'bg-blue-50');
+        }
+
+        // View notes function
+        function viewNotes(collaboratorId) {
+            alert(`Viewing notes for ${collaboratorId}`);
+        }
+
+        // Start messaging function
+        function startMessaging(collaboratorId) {
+            const messagingInterface = document.getElementById('messagingInterface');
+            const messagingTitle = document.getElementById('messagingTitle');
+            
+            messagingTitle.textContent = `Messages with ${collaboratorId}`;
+            messagingInterface.classList.remove('hidden');
+        }
+
+        // Close messaging
+        function closeMessaging() {
+            document.getElementById('messagingInterface').classList.add('hidden');
+        }
+
+        // Toggle requests
+        function toggleRequests() {
+            alert('Toggle requests functionality');
+        }
+
+        // Toggle messages
+        function toggleMessages() {
+            alert('Toggle messages functionality');
+        }
+
+        // Accept request
+        function acceptRequest(userId) {
+            alert(`Accepted request from ${userId}`);
+        }
+
+        // Decline request
+        function declineRequest(userId) {
+            alert(`Declined request from ${userId}`);
+        }
+
+        // Drag and Drop Functions
+        function allowDrop(ev) {
+            ev.preventDefault();
+            ev.currentTarget.classList.add('border-blue-400', 'bg-blue-50');
+        }
+
+        function drag(ev) {
+            ev.dataTransfer.setData("text", ev.target.outerHTML);
+            ev.dataTransfer.setData("user", ev.target.getAttribute('data-user'));
+            ev.dataTransfer.setData("source", ev.target.closest('[id$="-list"]').id);
+            ev.target.style.opacity = '0.5';
+        }
+
+        function drop(ev, targetSection) {
+            ev.preventDefault();
+            ev.currentTarget.classList.remove('border-blue-400', 'bg-blue-50');
+            
+            const data = ev.dataTransfer.getData("text");
+            const user = ev.dataTransfer.getData("user");
+            const sourceList = ev.dataTransfer.getData("source");
+            const targetList = targetSection === 'collaborators' ? 'collaborators-list' : 'team-list';
+            
+            // Check if it's the same list (no need to move)
+            if (sourceList === targetList) {
+                showNotification('User is already in this section', 'info');
+                return;
+            }
+            
+            // Check if user already exists in target list
+            const existingUser = document.querySelector(`#${targetList} [data-user="${user}"]`);
+            if (existingUser) {
+                showNotification('User already exists in this section', 'warning');
+                return;
+            }
+            
+            // Remove from source list
+            const sourceElement = document.querySelector(`#${sourceList} [data-user="${user}"]`);
+            if (sourceElement) {
+                sourceElement.remove();
+            }
+            
+            // Create new element from the dragged data
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = data;
+            const newElement = tempDiv.firstElementChild;
+            
+            // Reset opacity
+            newElement.style.opacity = '1';
+            
+            // Add to target list
+            document.getElementById(targetList).appendChild(newElement);
+            
+            // Show success message
+            showNotification(`Moved ${user} to ${targetSection === 'collaborators' ? 'Collaborators' : 'Team Members'}`, 'success');
+        }
+
+        // Add drag end event to reset opacity
+        document.addEventListener('dragend', function(ev) {
+            if (ev.target.classList.contains('collaborator-card')) {
+                ev.target.style.opacity = '1';
+            }
+        });
+
+        // Add drag leave event to remove visual feedback
+        document.addEventListener('dragleave', function(ev) {
+            if (ev.target.id === 'collaborators-section' || ev.target.id === 'team-section') {
+                ev.target.classList.remove('border-blue-400', 'bg-blue-50');
+            }
+        });
+
+        // Notification function
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 ${
+                type === 'success' ? 'bg-green-500 text-white' : 
+                type === 'error' ? 'bg-red-500 text-white' : 
+                'bg-blue-500 text-white'
+            }`;
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+    </script>
+</body>
+
+</html>

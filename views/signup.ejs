@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Account - Sync-pad</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body>
+    <main class="w-full h-screen bg-zinc-100 font-['Helvetica']">
+        <!-- Desktop Navigation -->
+        <nav class="hidden md:flex px-10 justify-between items-center py-5">
+            <div class="flex items-center gap-4">
+                <a href="/" class="text-2xl tracking-tight logo">SyncPad</a>
+                <span class="text-sm text-gray-500 font-light">Mini Project</span>
+            </div>
+            <div class="navlinks flex gap-5 items-center">
+                <a class="tracking-tight" href="/">Home</a>
+                <a class="tracking-tight px-4 py-2 text-blue-600 hover:text-blue-800 transition-colors" href="/login">
+                    Login
+                </a>
+            </div>
+        </nav>
+
+        <!-- Mobile Navigation -->
+        <nav class="md:hidden flex px-4 justify-between items-center py-4">
+            <div class="flex items-center gap-4">
+                <a href="/" class="text-xl tracking-tight logo">SyncPad</a>
+                <span class="text-xs text-gray-500 font-light">Mini Project</span>
+            </div>
+            <div class="flex gap-3 items-center">
+                <a class="tracking-tight text-sm" href="/">Home</a>
+                <a class="tracking-tight px-3 py-2 text-blue-600 hover:text-blue-800 transition-colors text-sm" href="/login">
+                    Login
+                </a>
+            </div>
+        </nav>
+        
+        <div class="flex items-center justify-center min-h-[calc(100vh-120px)]">
+            <div class="bg-white rounded-lg shadow-md p-8 w-full max-w-md">
+                <h2 class="text-2xl font-bold mb-6 text-center text-gray-800">Create New Account</h2>
+                
+                <% if (error) { %>
+                    <div class="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-md">
+                        <%= error %>
+                    </div>
+                <% } %>
+                
+                <form action="/signup" method="post" class="space-y-4">
+                    <div>
+                        <input type="text" name="name" class="w-full px-4 py-3 rounded-md bg-gray-100 border border-gray-300 focus:border-blue-500 focus:outline-none" placeholder="Full Name" required>
+                    </div>
+                    
+                    <div>
+                        <input type="email" name="email" class="w-full px-4 py-3 rounded-md bg-gray-100 border border-gray-300 focus:border-blue-500 focus:outline-none" placeholder="Email" required>
+                    </div>
+                    
+                    <div>
+                        <input type="password" name="password" class="w-full px-4 py-3 rounded-md bg-gray-100 border border-gray-300 focus:border-blue-500 focus:outline-none" placeholder="Password" required>
+                    </div>
+                    
+                    <button type="submit" class="w-full px-6 py-3 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors">
+                        Create Account
+                    </button>
+                </form>
+                
+                <div class="mt-6 text-center">
+                    <p class="text-gray-600">Already have an account?</p>
+                    <a href="/login" class="text-blue-600 hover:text-blue-800 transition-colors">Login here</a>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+
+</html>

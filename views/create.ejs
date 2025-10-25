@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Note - SyncPad</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Mobile encryption checkbox
+            const encryptedCheckbox = document.getElementById('encrypted-mobile');
+            const passcodeField = document.getElementById('passcode-field-mobile');
+            
+            if (encryptedCheckbox) {
+                encryptedCheckbox.addEventListener('change', function() {
+                    if (this.checked) {
+                        passcodeField.classList.remove('hidden');
+                    } else {
+                        passcodeField.classList.add('hidden');
+                    }
+                });
+            }
+            
+            // Desktop encryption checkbox
+            const encryptedCheckboxDesktop = document.getElementById('encrypted-desktop');
+            const passcodeFieldDesktop = document.getElementById('passcode-field-desktop');
+            
+            if (encryptedCheckboxDesktop) {
+                encryptedCheckboxDesktop.addEventListener('change', function() {
+                    if (this.checked) {
+                        passcodeFieldDesktop.classList.remove('hidden');
+                    } else {
+                        passcodeFieldDesktop.classList.add('hidden');
+                    }
+                });
+            }
+        });
+    </script>
+</head>
+
+<body>
+    <main class="w-full h-screen bg-zinc-100 font-['Helvetica']">
+        <!-- Desktop Navigation -->
+        <nav class="hidden md:flex px-10 justify-between items-center py-5">
+            <!-- Section 1: Project Name (Top-Left) -->
+            <div class="flex items-center gap-4">
+                <a href="/home" class="text-2xl tracking-tight logo">SyncPad</a>
+                <span class="text-sm text-gray-500 font-light">Mini Project</span>
+            </div>
+            
+            <!-- Section 2: Navigation (Top-Center) -->
+            <div class="flex items-center gap-4">
+                <a href="/home" class="px-4 py-2 text-gray-700 hover:text-blue-600 transition-colors font-medium flex items-center gap-2">
+                    <i class="ri-home-line"></i>
+                    Home
+                </a>
+                <a href="/collaborators" class="px-4 py-2 text-gray-700 hover:text-blue-600 transition-colors font-medium flex items-center gap-2">
+                    <i class="ri-dashboard-line"></i>
+                    Collaborators
+                </a>
+            </div>
+            
+            <!-- Section 3: Profile (Top-Right) -->
+            <div class="flex items-center gap-3">
+                <div class="text-right">
+                    <div class="text-sm text-gray-600">Welcome, <%= user.name %></div>
+                </div>
+                <!-- Profile Icon -->
+                <div class="relative">
+                    <button onclick="toggleProfile()" class="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-lg font-bold hover:from-blue-600 hover:to-purple-700 transition-all duration-300 shadow-lg hover:shadow-xl" style="border-radius: 50%;">
+                        <%= user.name.charAt(0).toUpperCase() %>
+                    </button>
+                    
+                    <!-- Profile Dropdown -->
+                    <div id="profileDropdown" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50">
+                        <div class="bg-white h-full w-full p-6">
+                            <div class="flex justify-between items-center mb-8">
+                                <h2 class="text-2xl font-bold text-gray-800">Profile</h2>
+                                <button onclick="toggleProfile()" class="p-2 text-gray-700 hover:text-blue-600 transition-colors">
+                                    <i class="ri-close-line text-2xl"></i>
+                                </button>
+                            </div>
+                            
+                            <div class="flex items-center gap-4 mb-8">
+                                <div class="w-20 h-20 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-3xl font-bold" style="border-radius: 50%;">
+                                    <%= user.name.charAt(0).toUpperCase() %>
+                                </div>
+                                <div>
+                                    <h3 class="text-2xl font-semibold text-gray-800"><%= user.name %></h3>
+                                    <p class="text-lg text-gray-500"><%= user.email %></p>
+                                </div>
+                            </div>
+                            
+                            <div class="space-y-4">
+                                <button onclick="editProfile()" class="w-full flex items-center gap-3 p-4 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors text-lg">
+                                    <i class="ri-edit-line text-xl"></i>
+                                    Edit Profile
+                                </button>
+                                <button onclick="changePassword()" class="w-full flex items-center gap-3 p-4 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors text-lg">
+                                    <i class="ri-lock-line text-xl"></i>
+                                    Change Password
+                                </button>
+                                <hr class="my-4">
+                                <a href="/logout" class="w-full flex items-center gap-3 p-4 text-red-600 hover:bg-red-50 rounded-lg transition-colors text-lg">
+                                    <i class="ri-logout-box-line text-xl"></i>
+                                    Logout
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Mobile Navigation -->
+        <nav class="md:hidden flex px-4 justify-between items-center py-4">
+            <!-- Mobile Menu Button (Top-Left) -->
+            <button onclick="toggleMobileMenu()" class="p-2 text-gray-700 hover:text-blue-600 transition-colors">
+                <i id="menuIcon" class="ri-menu-line text-2xl"></i>
+            </button>
+            
+            <!-- Project Name (Top-Center) -->
+            <div class="flex flex-col items-center">
+                <a href="/home" class="text-xl tracking-tight logo">SyncPad</a>
+                <span class="text-xs text-gray-500 font-light">Mini Project</span>
+            </div>
+            
+            <!-- Profile Picture (Top-Right) -->
+            <div class="relative">
+                <button onclick="toggleMobileProfile()" class="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-lg font-bold hover:from-blue-600 hover:to-purple-700 transition-all duration-300 shadow-lg hover:shadow-xl" style="border-radius: 50%;">
+                    <%= user.name.charAt(0).toUpperCase() %>
+                </button>
+                
+                <!-- Mobile Profile Dropdown -->
+                <div id="mobileProfileDropdown" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50">
+                    <div class="bg-white h-full w-full p-6">
+                        <div class="flex justify-between items-center mb-8">
+                            <h2 class="text-2xl font-bold text-gray-800">Profile</h2>
+                            <button onclick="toggleMobileProfile()" class="p-2 text-gray-700 hover:text-blue-600 transition-colors">
+                                <i class="ri-close-line text-2xl"></i>
+                            </button>
+                        </div>
+                        
+                        <div class="flex items-center gap-4 mb-8">
+                            <div class="w-20 h-20 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-3xl font-bold" style="border-radius: 50%;">
+                                <%= user.name.charAt(0).toUpperCase() %>
+                            </div>
+                            <div>
+                                <h3 class="text-2xl font-semibold text-gray-800"><%= user.name %></h3>
+                                <p class="text-lg text-gray-500"><%= user.email %></p>
+                            </div>
+                        </div>
+                        
+                        <div class="space-y-4">
+                            <button onclick="editProfile()" class="w-full flex items-center gap-3 p-4 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors text-lg">
+                                <i class="ri-edit-line text-xl"></i>
+                                Edit Profile
+                            </button>
+                            <button onclick="changePassword()" class="w-full flex items-center gap-3 p-4 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors text-lg">
+                                <i class="ri-lock-line text-xl"></i>
+                                Change Password
+                            </button>
+                            <hr class="my-4">
+                            <a href="/logout" class="w-full flex items-center gap-3 p-4 text-red-600 hover:bg-red-50 rounded-lg transition-colors text-lg">
+                                <i class="ri-logout-box-line text-xl"></i>
+                                Logout
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Mobile Menu Overlay -->
+        <div id="mobileMenu" class="md:hidden hidden fixed inset-0 bg-black bg-opacity-50 z-40">
+            <div class="bg-white h-full w-full p-6">
+                <div class="flex justify-between items-center mb-8">
+                    <h2 class="text-2xl font-bold text-gray-800">Menu</h2>
+                    <button onclick="toggleMobileMenu()" class="p-2 text-gray-700 hover:text-blue-600 transition-colors">
+                        <i class="ri-close-line text-2xl"></i>
+                    </button>
+                </div>
+                
+                <div class="space-y-6">
+                    <a href="/home" class="flex items-center gap-3 p-4 hover:bg-gray-50 rounded-lg text-gray-700">
+                        <i class="ri-home-line text-xl"></i>
+                        <span class="text-lg font-medium">Home</span>
+                    </a>
+                    
+                    <a href="/collaborators" class="flex items-center gap-3 p-4 hover:bg-gray-50 rounded-lg text-gray-700">
+                        <i class="ri-dashboard-line text-xl"></i>
+                        <span class="text-lg font-medium">Collaborators</span>
+                    </a>
+                </div>
+                
+                <div class="mt-8 pt-6 border-t">
+                    <div class="flex items-center gap-3 p-4">
+                        <div class="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-lg font-bold" style="border-radius: 50%;">
+                            <%= user.name.charAt(0).toUpperCase() %>
+                        </div>
+                        <div>
+                            <div class="font-medium text-gray-800"><%= user.name %></div>
+                            <div class="text-sm text-gray-500"><%= user.email %></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="px-10 notes">
+            <h3 class="capitalize text-2xl font-medium mb-8 mt-10 tracking-tight text-center">Create New Note</h3>
+            
+            <!-- Centered form container -->
+            <div class="flex justify-center items-center min-h-[60vh]">
+                <form class="max-w-2xl w-full" action="/createnote" method="post">
+                    <% if (error) { %>
+                        <div class="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-md">
+                            <%= error %>
+                        </div>
+                    <% } %>
+                <div class="mb-6">
+                    <input name="title" class="w-full px-4 py-3 rounded-md bg-gray-100 border border-gray-300 focus:border-blue-500 focus:outline-none" type="text"
+                        placeholder="Shopping notes, daily tasks...">
+                </div>
+                
+                <div class="mb-6">
+                    <textarea name="content" class="w-full px-4 py-3 resize-none bg-gray-100 border border-gray-300 rounded-md min-h-96 focus:border-blue-500 focus:outline-none"
+                        placeholder="Write your note content here..."></textarea>
+                </div>
+                
+                <!-- Mobile: 2x2 Grid Layout -->
+                <div class="grid grid-cols-2 gap-4 mb-6 md:hidden">
+                    <!-- First cell: Encrypt this note -->
+                    <div class="space-y-4">
+                        <div class="flex items-center">
+                            <input type="checkbox" name="encrypted" id="encrypted-mobile" class="mr-3">
+                            <label for="encrypted-mobile" class="text-gray-700 text-sm">Encrypt this note</label>
+                        </div>
+                        <div id="passcode-field-mobile" class="hidden">
+                            <input type="password" name="passcode-mobile" class="w-full px-3 py-2 rounded-md bg-gray-100 border border-gray-300 focus:border-blue-500 focus:outline-none text-sm" placeholder="Passcode">
+                        </div>
+                    </div>
+                    
+                    <!-- Second cell: Disable Edit -->
+                    <div class="space-y-4">
+                        <div class="flex items-center">
+                            <input type="checkbox" name="disableEdit" id="disableEdit-mobile" class="mr-3">
+                            <label for="disableEdit-mobile" class="text-gray-700 text-sm">Disable Edit</label>
+                        </div>
+                    </div>
+                    
+                    <!-- Third cell: Shareable (spans both columns) -->
+                    <div class="col-span-2 space-y-4">
+                        <div class="flex items-center">
+                            <input type="checkbox" name="shareable" id="shareable-mobile" class="mr-3">
+                            <label for="shareable-mobile" class="text-gray-700 text-sm">Shareable file?</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Desktop: Original Layout -->
+                <div class="hidden md:grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div class="space-y-4">
+                        <div class="flex items-center">
+                            <input type="checkbox" name="encrypted" id="encrypted-desktop" class="mr-3">
+                            <label for="encrypted-desktop" class="text-gray-700">Encrypt this file</label>
+                        </div>
+                        <div id="passcode-field-desktop" class="hidden">
+                            <input type="password" name="passcode-desktop" class="w-full px-4 py-2 rounded-md bg-gray-100 border border-gray-300 focus:border-blue-500 focus:outline-none" placeholder="Passcode">
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <div class="flex items-center">
+                            <input type="checkbox" name="shareable" id="shareable-desktop" class="mr-3">
+                            <label for="shareable-desktop" class="text-gray-700">Shareable file?</label>
+                        </div>
+                        <div class="flex items-center">
+                            <input type="checkbox" name="disableEdit" id="disableEdit-desktop" class="mr-3">
+                            <label for="disableEdit-desktop" class="text-gray-700">Disable Edit</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <button type="submit" class="px-6 py-3 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors">
+                    Create New Note
+                </button>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <footer class="px-10 py-8 bg-gray-800 text-white">
+            <div class="max-w-6xl mx-auto text-center">
+                <p class="text-gray-400">© 2024 SyncPad Mini Project. Built with ❤️ for collaborative note-taking.</p>
+            </div>
+        </footer>
+    </main>
+
+    <script>
+        // Desktop Profile dropdown toggle
+        function toggleProfile() {
+            const dropdown = document.getElementById('profileDropdown');
+            dropdown.classList.toggle('hidden');
+        }
+
+        // Mobile Profile dropdown toggle
+        function toggleMobileProfile() {
+            const dropdown = document.getElementById('mobileProfileDropdown');
+            dropdown.classList.toggle('hidden');
+        }
+
+        // Mobile Menu toggle
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobileMenu');
+            const menuIcon = document.getElementById('menuIcon');
+            
+            menu.classList.toggle('hidden');
+            
+            if (menu.classList.contains('hidden')) {
+                menuIcon.className = 'ri-menu-line text-2xl';
+            } else {
+                menuIcon.className = 'ri-close-line text-2xl';
+            }
+        }
+
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', function(event) {
+            const profileButton = event.target.closest('button[onclick="toggleProfile()"]');
+            const mobileProfileButton = event.target.closest('button[onclick="toggleMobileProfile()"]');
+            const profileDropdown = document.getElementById('profileDropdown');
+            const mobileProfileDropdown = document.getElementById('mobileProfileDropdown');
+            
+            if (!profileButton && !profileDropdown.contains(event.target)) {
+                profileDropdown.classList.add('hidden');
+            }
+            
+            if (!mobileProfileButton && !mobileProfileDropdown.contains(event.target)) {
+                mobileProfileDropdown.classList.add('hidden');
+            }
+        });
+
+        // Edit profile function
+        function editProfile() {
+            alert('Edit Profile functionality will be implemented here');
+        }
+
+        // Change password function
+        function changePassword() {
+            alert('Change Password functionality will be implemented here');
+        }
+    </script>
+</body>
+
+</html>

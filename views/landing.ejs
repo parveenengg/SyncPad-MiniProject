@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SyncPad - Collaborative Note Taking</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body>
+    <main class="w-full min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 font-['Helvetica']">
+        <!-- Navigation -->
+        <nav class="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-gray-200">
+            <div class="flex px-4 md:px-10 justify-between items-center py-5">
+                <!-- Top-Left Section -->
+                <div class="flex items-center gap-4">
+                    <a href="/" class="text-2xl tracking-tight logo">SyncPad</a>
+                    <span class="text-sm text-gray-500 font-light">Mini Project</span>
+                </div>
+                
+                <!-- Desktop: Top-Center and Top-Right Section -->
+                <div class="hidden md:flex items-center gap-6">
+                    <a href="https://github.com/your-username/syncpad-fullstack" class="px-6 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all duration-300 shadow-lg hover:shadow-xl">
+                        <i class="ri-github-line mr-2"></i>
+                        View Full-Stack Project
+                    </a>
+                    <a href="/login" class="px-4 py-2 text-blue-600 hover:text-blue-800 transition-colors">
+                        Login
+                    </a>
+                </div>
+                
+                <!-- Mobile: Top-Right Section -->
+                <div class="md:hidden flex items-center gap-3">
+                    <a href="https://github.com/your-username/syncpad-fullstack" class="px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all duration-300 shadow-lg hover:shadow-xl text-sm">
+                        <i class="ri-github-line mr-1"></i>
+                        View Project
+                    </a>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Hero Section -->
+        <div class="px-10 py-20">
+            <div class="max-w-4xl mx-auto text-center">
+                <h1 class="text-5xl font-bold text-gray-800 mb-6">
+                    Collaborative Note Taking
+                    <span class="block text-3xl text-gray-600 font-normal mt-2">Made Simple</span>
+                </h1>
+                <p class="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
+                    Create, share, and collaborate on notes with your team. SyncPad makes it easy to capture ideas, 
+                    share knowledge, and work together seamlessly.
+                </p>
+                
+                <div class="flex gap-4 justify-center">
+                    <a href="/login" class="px-8 py-4 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-lg font-semibold">
+                        Login
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Features Section -->
+        <div id="features" class="px-10 py-20 bg-white">
+            <div class="max-w-6xl mx-auto">
+                <h2 class="text-3xl font-bold text-center text-gray-800 mb-12">Powerful Features</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <div class="text-center p-6">
+                        <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="ri-edit-line text-2xl text-blue-600"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-3 text-gray-800">Easy Note Creation</h3>
+                        <p class="text-gray-600">Create and edit notes with a simple, intuitive interface. Rich text formatting and organization.</p>
+                    </div>
+                    
+                    <div class="text-center p-6">
+                        <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="ri-share-line text-2xl text-green-600"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-3 text-gray-800">Share & Collaborate</h3>
+                        <p class="text-gray-600">Share notes with unique links. Collaborate in real-time with your team members.</p>
+                    </div>
+                    
+                    <div class="text-center p-6">
+                        <div class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="ri-lock-line text-2xl text-purple-600"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-3 text-gray-800">Secure & Private</h3>
+                        <p class="text-gray-600">Encrypt sensitive notes with passcodes. Keep your important information secure.</p>
+                    </div>
+                    
+                    <div class="text-center p-6">
+                        <div class="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="ri-team-line text-2xl text-orange-600"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-3 text-gray-800">Team Collaboration</h3>
+                        <p class="text-gray-600">Work together on shared notes. Set permissions and manage access levels.</p>
+                    </div>
+                    
+                    <div class="text-center p-6">
+                        <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="ri-time-line text-2xl text-red-600"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-3 text-gray-800">Real-time Updates</h3>
+                        <p class="text-gray-600">See changes as they happen. Stay synchronized with your team's latest updates.</p>
+                    </div>
+                    
+                    <div class="text-center p-6">
+                        <div class="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="ri-dashboard-line text-2xl text-indigo-600"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-3 text-gray-800">Smart Dashboard</h3>
+                        <p class="text-gray-600">Organize your notes with a powerful dashboard. Quick access to recent and shared notes.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- About Section -->
+        <div id="about" class="px-10 py-20 bg-gray-50">
+            <div class="max-w-4xl mx-auto text-center">
+                <h2 class="text-3xl font-bold text-gray-800 mb-8">About SyncPad</h2>
+                <p class="text-lg text-gray-600 mb-8">
+                    SyncPad is a collaborative note-taking application designed to help teams and individuals 
+                    capture, organize, and share knowledge effectively. Built with modern web technologies, 
+                    it provides a seamless experience for creating and managing notes.
+                </p>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+                    <div>
+                        <h3 class="text-xl font-semibold text-gray-800 mb-2">Simple</h3>
+                        <p class="text-gray-600">Easy-to-use interface that anyone can master quickly.</p>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-semibold text-gray-800 mb-2">Secure</h3>
+                        <p class="text-gray-600">Your data is protected with encryption and secure sharing.</p>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-semibold text-gray-800 mb-2">Collaborative</h3>
+                        <p class="text-gray-600">Work together seamlessly with real-time collaboration.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="px-10 py-8 bg-gray-800 text-white">
+            <div class="max-w-6xl mx-auto text-center">
+                <p class="text-gray-400">© 2024 SyncPad Mini Project. Built with ❤️ for collaborative note-taking.</p>
+            </div>
+        </footer>
+    </main>
+</body>
+
+</html>
