@@ -17,15 +17,9 @@ const { requireAuth } = require('../controllers/authController');
 // Home route
 router.get('/home', requireAuth, getDashboard); // Keep for backward compatibility
 
-// Collaborators route (New Dashboard)
+// Dashboard route (redirects to home)
 router.get('/collaborators', requireAuth, (req, res) => {
-    res.render('collaborators', {
-        user: {
-            name: req.session.userName,
-            email: req.session.userEmail,
-            uniqueId: req.session.userUniqueId
-        }
-    });
+    res.redirect('/home');
 });
 
 // Notes listing route
