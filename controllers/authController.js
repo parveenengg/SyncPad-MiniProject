@@ -24,6 +24,7 @@ const getSignupPage = (req, res) => {
 // Handle user login
 const login = async (req, res) => {
     try {
+        console.log('Login attempt:', { email: req.body.email, hasPassword: !!req.body.password });
         const { email, password } = req.body;
         
         // Input validation
@@ -61,6 +62,7 @@ const login = async (req, res) => {
         req.session.userName = user.name;
         req.session.userUniqueId = user.uniqueId;
         
+        console.log('Login successful, redirecting to /home');
         res.redirect('/home');
     } catch (error) {
         console.error('Login error:', error);
@@ -71,6 +73,7 @@ const login = async (req, res) => {
 // Handle user signup
 const signup = async (req, res) => {
     try {
+        console.log('Signup attempt:', { email: req.body.email, hasPassword: !!req.body.password, name: req.body.name });
         const { email, password, name } = req.body;
         
         // Input validation
@@ -122,6 +125,7 @@ const signup = async (req, res) => {
         req.session.userName = user.name;
         req.session.userUniqueId = user.uniqueId;
         
+        console.log('Signup successful, redirecting to /home');
         res.redirect('/home');
     } catch (error) {
         console.error('Signup error:', error);
@@ -152,7 +156,7 @@ const requireAuth = (req, res, next) => {
 // Middleware to check if user is not authenticated (for login/signup pages)
 const requireGuest = (req, res, next) => {
     if (req.session && req.session.userId) {
-        return res.redirect('/dashboard');
+        return res.redirect('/home');
     } else {
         return next();
     }
