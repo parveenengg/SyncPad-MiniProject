@@ -1,6 +1,13 @@
 const Message = require('../models/Message');
 const User = require('../models/User');
 
+// Add error handling wrapper for all controller functions
+const handleAsync = (fn) => {
+    return (req, res, next) => {
+        Promise.resolve(fn(req, res, next)).catch(next);
+    };
+};
+
 /**
  * Sanitize user input to prevent XSS attacks
  * @param {string} input - The input string to sanitize
@@ -278,11 +285,11 @@ const getMessagingUsers = async (req, res) => {
 };
 
 module.exports = {
-    getConversations,
-    getMessages,
-    sendMessage,
-    getUnreadCount,
-    markAsRead,
-    deleteMessage,
-    getMessagingUsers
+    getConversations: handleAsync(getConversations),
+    getMessages: handleAsync(getMessages),
+    sendMessage: handleAsync(sendMessage),
+    getUnreadCount: handleAsync(getUnreadCount),
+    markAsRead: handleAsync(markAsRead),
+    deleteMessage: handleAsync(deleteMessage),
+    getMessagingUsers: handleAsync(getMessagingUsers)
 };

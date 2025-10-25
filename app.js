@@ -7,7 +7,19 @@ const mongoose = require('mongoose');
 const connectDB = require('./config/database');
 const noteRoutes = require('./routes/noteRoutes');
 const authRoutes = require('./routes/authRoutes');
-const messageRoutes = require('./routes/messageRoutes');
+
+// Safely import message routes with error handling
+let messageRoutes;
+try {
+    messageRoutes = require('./routes/messageRoutes');
+} catch (error) {
+    console.error('Error loading message routes:', error);
+    // Create a dummy router if message routes fail to load
+    messageRoutes = require('express').Router();
+    messageRoutes.get('*', (req, res) => {
+        res.status(503).json({ error: 'Messaging system temporarily unavailable' });
+    });
+}
 
 const app = express();
 const PORT = process.env.PORT || 3330;

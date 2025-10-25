@@ -6,6 +6,12 @@ const auth = require('../middleware/auth');
 // Apply authentication middleware to all routes
 router.use(auth);
 
+// Add error handling middleware for message routes
+router.use((err, req, res, next) => {
+    console.error('Message route error:', err);
+    res.status(500).json({ error: 'Internal server error in messaging system' });
+});
+
 // Get all conversations for the current user
 router.get('/conversations', messageController.getConversations);
 
