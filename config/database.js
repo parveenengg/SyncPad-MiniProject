@@ -2,10 +2,16 @@ const mongoose = require('mongoose');
 
 const connectDB = async () => {
     try {
+        console.log('=== MONGODB CONNECTION DEBUG ===');
         console.log('Attempting to connect to MongoDB...');
         console.log('MONGODB_URI exists:', !!process.env.MONGODB_URI);
+        console.log('MONGODB_URI length:', process.env.MONGODB_URI ? process.env.MONGODB_URI.length : 0);
+        console.log('MONGODB_URI starts with:', process.env.MONGODB_URI ? process.env.MONGODB_URI.substring(0, 30) + '...' : 'NOT SET');
         
-        const conn = await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/sync-pad', {
+        const uri = process.env.MONGODB_URI || 'mongodb://localhost:27017/sync-pad';
+        console.log('Using URI:', uri.substring(0, 30) + '...');
+        
+        const conn = await mongoose.connect(uri, {
             serverSelectionTimeoutMS: 10000, // Increased to 10 seconds
             socketTimeoutMS: 45000, // Close sockets after 45 seconds of inactivity
             connectTimeoutMS: 10000, // Connection timeout
