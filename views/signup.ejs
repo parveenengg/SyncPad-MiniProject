@@ -63,6 +63,32 @@
                         <input type="password" name="password" class="w-full px-4 py-3 rounded-md bg-gray-100 border border-gray-300 focus:border-blue-500 focus:outline-none" placeholder="Password" required>
                     </div>
                     
+                    <!-- Security Question Section -->
+                    <div class="border-t pt-4">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-3">Security Question (Optional)</h3>
+                        <p class="text-sm text-gray-600 mb-4">Set up a security question for password recovery</p>
+                        
+                        <div class="mb-4">
+                            <select name="securityQuestion" class="w-full px-4 py-3 rounded-md bg-gray-100 border border-gray-300 focus:border-blue-500 focus:outline-none">
+                                <option value="">Select a security question</option>
+                                <option value="What was the name of your first pet?">What was the name of your first pet?</option>
+                                <option value="What city were you born in?">What city were you born in?</option>
+                                <option value="What was your mother's maiden name?">What was your mother's maiden name?</option>
+                                <option value="What was the name of your elementary school?">What was the name of your elementary school?</option>
+                                <option value="What was your childhood nickname?">What was your childhood nickname?</option>
+                                <option value="What was the make of your first car?">What was the make of your first car?</option>
+                                <option value="What was your favorite teacher's name?">What was your favorite teacher's name?</option>
+                                <option value="What was the name of the street you grew up on?">What was the name of the street you grew up on?</option>
+                                <option value="What was your first job?">What was your first job?</option>
+                                <option value="What was the name of your first best friend?">What was the name of your first best friend?</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <input type="text" name="securityAnswer" class="w-full px-4 py-3 rounded-md bg-gray-100 border border-gray-300 focus:border-blue-500 focus:outline-none" placeholder="Your answer">
+                        </div>
+                    </div>
+                    
                     <button type="submit" class="w-full px-6 py-3 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors">
                         Create Account
                     </button>

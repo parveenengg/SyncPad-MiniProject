@@ -8,11 +8,14 @@
 }
 
 body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     line-height: 1.6;
     color: #333;
     background-color: #f8f9fa;
 }
+
+/* Import Inter font */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 /* Container */
 .container {
@@ -321,6 +324,98 @@ body {
     }
 }
 
+/* Mobile Touch Optimizations */
+@media (max-width: 768px) {
+    /* Larger touch targets for mobile */
+    button, .btn, a {
+        min-height: 44px;
+        min-width: 44px;
+    }
+    
+    /* Better spacing for mobile */
+    .form-control {
+        font-size: 16px; /* Prevents zoom on iOS */
+        padding: 12px;
+    }
+    
+    /* Mobile-friendly dropdowns */
+    .dropdown-menu {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 100%;
+        height: 100%;
+        border-radius: 0;
+        z-index: 9999;
+    }
+    
+    /* Mobile navigation improvements */
+    .navbar {
+        padding: 0.75rem 0;
+    }
+    
+    .nav-links {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: white;
+        z-index: 1000;
+        padding: 2rem 1rem;
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+    }
+    
+    .nav-links.show {
+        transform: translateX(0);
+    }
+    
+    /* Mobile card improvements */
+    .card {
+        margin: 0.5rem;
+        border-radius: 12px;
+    }
+    
+    /* Mobile table improvements */
+    .table-responsive {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    /* Mobile form improvements */
+    .form-container {
+        margin: 1rem;
+        padding: 1.5rem 1rem;
+    }
+    
+    /* Mobile button improvements */
+    .btn {
+        width: 100%;
+        padding: 12px 16px;
+        font-size: 16px;
+        border-radius: 8px;
+    }
+    
+    /* Mobile grid improvements */
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+    }
+    
+    .stats-grid {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+    }
+    
+    .notes-list {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+    }
+}
+
 /* Utility Classes */
 .text-center { text-align: center; }
 .text-left { text-align: left; }
@@ -345,6 +440,18 @@ body {
 .d-block { display: block; }
 .d-flex { display: flex; }
 .d-grid { display: grid; }
+
+/* Mobile-specific utility classes */
+.mobile-hidden { display: none; }
+.mobile-full { width: 100% !important; }
+.mobile-center { text-align: center; }
+.mobile-padding { padding: 1rem; }
+.mobile-margin { margin: 1rem; }
+
+@media (min-width: 769px) {
+    .mobile-hidden { display: block; }
+    .mobile-full { width: auto; }
+}
 
 /* Error and Success Messages */
 .alert {

@@ -7,19 +7,14 @@ const mongoose = require('mongoose');
 const connectDB = require('./config/database');
 const noteRoutes = require('./routes/noteRoutes');
 const authRoutes = require('./routes/authRoutes');
+const profileRoutes = require('./routes/profileRoutes');
+const spectatorRoutes = require('./routes/spectatorRoutes');
+const adminRoutes = require('./routes/adminRoutes');
+const { errorHandler } = require('./middleware/errorHandler');
+const logger = require('./utils/logger');
 
-// Safely import message routes with error handling
-let messageRoutes;
-try {
-    messageRoutes = require('./routes/messageRoutes');
-} catch (error) {
-    console.error('Error loading message routes:', error);
-    // Create a dummy router if message routes fail to load
-    messageRoutes = require('express').Router();
-    messageRoutes.get('*', (req, res) => {
-        res.status(503).json({ error: 'Messaging system temporarily unavailable' });
-    });
-}
+// Import message routes
+const messageRoutes = require('./routes/messageRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 3330;
@@ -30,10 +25,8 @@ connectDB();
 // Rate limiting
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 1000, // limit each IP to 1000 requests per windowMs (increased from 100)
-    message: 'Too many requests from this IP, please try again later.',
-    standardHeaders: true,
-    legacyHeaders: false,
+    max: 100, // limit each IP to 100 requests per windowMs
+    message: 'Too many requests from this IP, please try again later.'
 });
 
 // Middleware
@@ -48,32 +41,22 @@ app.use(session({
     resave: false,
     saveUninitialized: false,
     cookie: {
-        secure: false, // Set to false for Vercel compatibility
-        httpOnly: true, // Prevent XSS attacks
-        maxAge: 24 * 60 * 60 * 1000, // 24 hours
-        sameSite: 'lax' // CSRF protection
-    },
-    name: 'syncpad.sid' // Custom session name
+        secure: false,
+        httpOnly: true,
+        maxAge: 24 * 60 * 60 * 1000 // 24 hours
+    }
 }));
 
 // Set EJS as view engine
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
-// Test session route
-app.get('/test-session', (req, res) => {
-    res.json({
-        sessionId: req.sessionID,
-        sessionData: req.session,
-        hasUserId: !!req.session.userId,
-        userId: req.session.userId
-    });
-});
-
-
 // Routes
 app.use('/', authRoutes);
 app.use('/', noteRoutes);
+app.use('/', profileRoutes);
+app.use('/', spectatorRoutes);
+app.use('/admin', adminRoutes);
 app.use('/api/messages', messageRoutes);
 
 // 404 handler
@@ -88,19 +71,12 @@ app.use((req, res) => {
 });
 
 // Global error handler
-app.use((err, req, res, next) => {
-    console.error('Global error:', err);
-    res.status(500).render('error', { 
-        error: 'Something went wrong!',
-        user: req.session ? {
-            name: req.session.userName,
-            email: req.session.userEmail
-        } : null
-    });
-});
+app.use(errorHandler);
 
 // Start server
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
-    console.log('Connected to MongoDB');
 });
+
+// Export for Vercel
+module.exports = app;

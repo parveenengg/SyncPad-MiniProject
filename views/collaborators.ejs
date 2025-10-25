@@ -225,15 +225,45 @@
                     </div>
                     
                     <div class="space-y-4" id="collaborators-list">
-                        <!-- Empty state for collaborators -->
-                        <div class="text-center py-8 text-gray-500">
-                            <i class="ri-user-add-line text-4xl mb-4 block"></i>
-                            <p class="text-lg font-medium mb-2">No collaborators yet</p>
-                            <p class="text-sm">Add collaborators to start working together</p>
-                            <button onclick="showAddCollaboratorModal()" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-                                <i class="ri-add-line mr-2"></i>
-                                Add Collaborator
-                            </button>
+                        <!-- Search Bar -->
+                        <div class="mb-4">
+                            <input type="text" id="userSearch" placeholder="Search users..." 
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                   onkeyup="searchUsers()">
+                        </div>
+                        
+                        <!-- Users List -->
+                        <div id="usersList" class="space-y-3">
+                            <% if (users && users.length > 0) { %>
+                                <% users.forEach(user => { %>
+                                    <div class="flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                                        <div class="flex items-center gap-3">
+                                            <div class="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-sm font-bold">
+                                                <%= user.name.charAt(0).toUpperCase() %>
+                                            </div>
+                                            <div>
+                                                <div class="font-medium text-gray-800"><%= user.name %></div>
+                                                <div class="text-sm text-gray-500"><%= user.email %></div>
+                                                <div class="text-xs text-gray-400">ID: <%= user.uniqueId %></div>
+                                            </div>
+                                        </div>
+                                        <div class="flex items-center gap-2">
+                                            <span class="text-xs text-gray-500"><%= user.publicNoteCount %> public notes</span>
+                                            <button onclick="viewUserNotes('<%= user.id %>')" 
+                                                    class="px-3 py-1 bg-blue-100 text-blue-600 rounded-md hover:bg-blue-200 transition-colors text-sm">
+                                                <i class="ri-eye-line mr-1"></i>
+                                                View Notes
+                                            </button>
+                                        </div>
+                                    </div>
+                                <% }); %>
+                            <% } else { %>
+                                <div class="text-center py-8 text-gray-500">
+                                    <i class="ri-user-line text-4xl mb-4 block"></i>
+                                    <p class="text-lg font-medium mb-2">No users found</p>
+                                    <p class="text-sm">Try adjusting your search or check back later</p>
+                                </div>
+                            <% } %>
                         </div>
                     </div>
                 </div>
@@ -397,9 +427,62 @@
             event.currentTarget.classList.add('border-blue-500', 'bg-blue-50');
         }
 
-        // View notes function
-        function viewNotes(collaboratorId) {
-            alert(`Viewing notes for ${collaboratorId}`);
+        // View user notes function
+        function viewUserNotes(userId) {
+            window.location.href = `/user/${userId}/notes`;
+        }
+
+        // Search users function
+        async function searchUsers() {
+            const query = document.getElementById('userSearch').value.trim();
+            const usersList = document.getElementById('usersList');
+            
+            if (query.length < 2) {
+                // Show all users if query is too short
+                location.reload();
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/search-users?query=${encodeURIComponent(query)}`);
+                const data = await response.json();
+                
+                if (data.users && data.users.length > 0) {
+                    usersList.innerHTML = data.users.map(user => `
+                        <div class="flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-sm font-bold">
+                                    ${user.name.charAt(0).toUpperCase()}
+                                </div>
+                                <div>
+                                    <div class="font-medium text-gray-800">${user.name}</div>
+                                    <div class="text-sm text-gray-500">${user.email}</div>
+                                    <div class="text-xs text-gray-400">ID: ${user.uniqueId}</div>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="text-xs text-gray-500">${user.publicNoteCount} public notes</span>
+                                <button onclick="viewUserNotes('${user.id}')" 
+                                        class="px-3 py-1 bg-blue-100 text-blue-600 rounded-md hover:bg-blue-200 transition-colors text-sm">
+                                    <i class="ri-eye-line mr-1"></i>
+                                    View Notes
+                                </button>
+                            </div>
+                        </div>
+                    `).join('');
+                } else {
+                    usersList.innerHTML = `
+                        <div class="text-center py-8 text-gray-500">
+                            <i class="ri-search-line text-4xl mb-4 block"></i>
+                            <p class="text-lg font-medium mb-2">No users found</p>
+                            <p class="text-sm">Try a different search term</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error searching users:', error);
+                showNotification('Error searching users', 'error');
+            }
         }
 
         // Start messaging function

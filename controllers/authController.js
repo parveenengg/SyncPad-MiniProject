@@ -25,23 +25,7 @@ const getSignupPage = (req, res) => {
 // Handle user login
 const login = async (req, res) => {
     try {
-        console.log('Login attempt:', { email: req.body.email, hasPassword: !!req.body.password });
-        console.log('MongoDB connection state:', mongoose.connection.readyState);
-        
-        // Ensure database is connected
-        if (mongoose.connection.readyState !== 1) {
-            console.log('Database not connected, attempting to connect...');
-            try {
-                await mongoose.connect(process.env.MONGODB_URI, {
-                    serverSelectionTimeoutMS: 10000,
-                    connectTimeoutMS: 10000,
-                });
-                console.log('Database connected successfully');
-            } catch (error) {
-                console.error('Failed to connect to database:', error);
-                return res.render('login', { error: 'Database connection error. Please try again.' });
-            }
-        }
+        console.log('Login attempt for:', req.body.email);
         
         const { email, password } = req.body;
         
@@ -109,25 +93,9 @@ const login = async (req, res) => {
 // Handle user signup
 const signup = async (req, res) => {
     try {
-        console.log('Signup attempt:', { email: req.body.email, hasPassword: !!req.body.password, name: req.body.name });
-        console.log('MongoDB connection state:', mongoose.connection.readyState);
+        console.log('Signup attempt for:', req.body.email);
         
-        // Ensure database is connected
-        if (mongoose.connection.readyState !== 1) {
-            console.log('Database not connected, attempting to connect...');
-            try {
-                await mongoose.connect(process.env.MONGODB_URI, {
-                    serverSelectionTimeoutMS: 10000,
-                    connectTimeoutMS: 10000,
-                });
-                console.log('Database connected successfully');
-            } catch (error) {
-                console.error('Failed to connect to database:', error);
-                return res.render('signup', { error: 'Database connection error. Please try again.' });
-            }
-        }
-        
-        const { email, password, name } = req.body;
+        const { email, password, name, securityQuestion, securityAnswer } = req.body;
         
         // Input validation
         if (!email || !password) {
@@ -153,11 +121,21 @@ const signup = async (req, res) => {
         }
         
         // Create new user
-        const user = new User({
+        const userData = {
             email: sanitizeInput(email).toLowerCase(),
             password,
             name: sanitizeInput(name) || email.split('@')[0] // Use email prefix as name if not provided
-        });
+        };
+
+        // Add security question if provided
+        if (securityQuestion && securityAnswer && securityAnswer.trim().length >= 3) {
+            userData.securityQuestion = {
+                question: securityQuestion.trim(),
+                answer: securityAnswer.trim()
+            };
+        }
+
+        const user = new User(userData);
         
         await user.save();
         

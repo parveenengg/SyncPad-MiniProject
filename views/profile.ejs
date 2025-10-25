@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - SyncPad</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Include Navbar -->
+    <%- include('partials/navbar', { user: user }) %>
+
+    <!-- Main Content -->
+    <div class="max-w-4xl mx-auto px-4 py-8">
+        <!-- Header -->
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-800 mb-2">Profile Settings</h1>
+            <p class="text-gray-600">Manage your account information and security settings</p>
+        </div>
+
+        <!-- Profile Information Card -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 mb-6">
+            <div class="p-6">
+                <div class="flex items-center gap-4 mb-6">
+                    <div class="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-2xl font-bold">
+                        <%= user.name.charAt(0).toUpperCase() %>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-semibold text-gray-800"><%= user.name %></h2>
+                        <p class="text-gray-600"><%= user.email %></p>
+                        <p class="text-sm text-gray-500">ID: <%= user.uniqueId %></p>
+                    </div>
+                </div>
+
+                <!-- Profile Update Form -->
+                <form id="profileForm" class="space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="name" class="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
+                            <input type="text" id="name" name="name" value="<%= user.name %>" 
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        </div>
+                        <div>
+                            <label for="email" class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                            <input type="email" id="email" name="email" value="<%= user.email %>" 
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        </div>
+                    </div>
+                    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors">
+                        Update Profile
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Password Change Card -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 mb-6">
+            <div class="p-6">
+                <h3 class="text-xl font-semibold text-gray-800 mb-4">Change Password</h3>
+                <form id="passwordForm" class="space-y-4">
+                    <div>
+                        <label for="currentPassword" class="block text-sm font-medium text-gray-700 mb-2">Current Password</label>
+                        <input type="password" id="currentPassword" name="currentPassword" 
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="newPassword" class="block text-sm font-medium text-gray-700 mb-2">New Password</label>
+                            <input type="password" id="newPassword" name="newPassword" 
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        </div>
+                        <div>
+                            <label for="confirmPassword" class="block text-sm font-medium text-gray-700 mb-2">Confirm New Password</label>
+                            <input type="password" id="confirmPassword" name="confirmPassword" 
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        </div>
+                    </div>
+                    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors">
+                        Change Password
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Security Question Card -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+            <div class="p-6">
+                <h3 class="text-xl font-semibold text-gray-800 mb-4">Security Question</h3>
+                <% if (user.hasSecurityQuestion) { %>
+                    <p class="text-sm text-gray-600 mb-4">Current question: <strong><%= currentQuestion %></strong></p>
+                <% } else { %>
+                    <p class="text-sm text-gray-600 mb-4">No security question set. This is required for password recovery.</p>
+                <% } %>
+                
+                <form id="securityForm" class="space-y-4">
+                    <div>
+                        <label for="securityQuestion" class="block text-sm font-medium text-gray-700 mb-2">Security Question</label>
+                        <select id="securityQuestion" name="securityQuestion" 
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <option value="">Select a security question</option>
+                            <% securityQuestions.forEach(question => { %>
+                                <option value="<%= question %>" <%= currentQuestion === question ? 'selected' : '' %>><%= question %></option>
+                            <% }); %>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="securityAnswer" class="block text-sm font-medium text-gray-700 mb-2">Answer</label>
+                        <input type="text" id="securityAnswer" name="securityAnswer" 
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                               placeholder="Enter your answer">
+                    </div>
+                    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors">
+                        <%= user.hasSecurityQuestion ? 'Update Security Question' : 'Set Security Question' %>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success/Error Messages -->
+    <div id="messageContainer" class="fixed top-4 right-4 z-50"></div>
+
+    <script>
+        // Profile Update Form
+        document.getElementById('profileForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            
+            try {
+                const response = await fetch('/profile/update', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        name: formData.get('name'),
+                        email: formData.get('email')
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showMessage('Profile updated successfully!', 'success');
+                    // Update session data
+                    if (result.user) {
+                        // You might want to refresh the page or update the UI
+                        setTimeout(() => location.reload(), 1000);
+                    }
+                } else {
+                    showMessage(result.error || 'Failed to update profile', 'error');
+                }
+            } catch (error) {
+                showMessage('An error occurred while updating profile', 'error');
+            }
+        });
+
+        // Password Change Form
+        document.getElementById('passwordForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            
+            try {
+                const response = await fetch('/profile/change-password', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        currentPassword: formData.get('currentPassword'),
+                        newPassword: formData.get('newPassword'),
+                        confirmPassword: formData.get('confirmPassword')
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showMessage('Password changed successfully!', 'success');
+                    e.target.reset();
+                } else {
+                    showMessage(result.error || 'Failed to change password', 'error');
+                }
+            } catch (error) {
+                showMessage('An error occurred while changing password', 'error');
+            }
+        });
+
+        // Security Question Form
+        document.getElementById('securityForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            
+            try {
+                const response = await fetch('/profile/security-question', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        question: formData.get('securityQuestion'),
+                        answer: formData.get('securityAnswer')
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showMessage('Security question updated successfully!', 'success');
+                    setTimeout(() => location.reload(), 1000);
+                } else {
+                    showMessage(result.error || 'Failed to update security question', 'error');
+                }
+            } catch (error) {
+                showMessage('An error occurred while updating security question', 'error');
+            }
+        });
+
+        // Show message function
+        function showMessage(message, type) {
+            const container = document.getElementById('messageContainer');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `px-6 py-3 rounded-md shadow-lg mb-2 ${
+                type === 'success' ? 'bg-green-100 text-green-800 border border-green-200' : 'bg-red-100 text-red-800 border border-red-200'
+            }`;
+            messageDiv.textContent = message;
+            
+            container.appendChild(messageDiv);
+            
+            setTimeout(() => {
+                messageDiv.remove();
+            }, 5000);
+        }
+    </script>
+</body>
+</html>

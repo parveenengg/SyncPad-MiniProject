@@ -31,6 +31,24 @@ const userSchema = new mongoose.Schema({
     lastLogin: {
         type: Date,
         default: Date.now
+    },
+    securityQuestion: {
+        question: {
+            type: String,
+            required: false,
+            trim: true
+        },
+        answer: {
+            type: String,
+            required: false,
+            trim: true
+        }
+    },
+    // User role
+    role: {
+        type: String,
+        enum: ['user', 'admin'],
+        default: 'user'
     }
 });
 
@@ -85,9 +103,39 @@ userSchema.pre('save', async function(next) {
     }
 });
 
+// Hash security answer before saving
+userSchema.pre('save', async function(next) {
+    if (!this.isModified('securityQuestion.answer')) return next();
+    
+    if (this.securityQuestion && this.securityQuestion.answer) {
+        try {
+            const salt = await bcrypt.genSalt(10);
+            this.securityQuestion.answer = await bcrypt.hash(this.securityQuestion.answer.toLowerCase().trim(), salt);
+            next();
+        } catch (error) {
+            next(error);
+        }
+    } else {
+        next();
+    }
+});
+
 // Compare password method
 userSchema.methods.comparePassword = async function(candidatePassword) {
     return await bcrypt.compare(candidatePassword, this.password);
+};
+
+// Compare security answer method
+userSchema.methods.compareSecurityAnswer = async function(candidateAnswer) {
+    if (!this.securityQuestion || !this.securityQuestion.answer) {
+        return false;
+    }
+    return await bcrypt.compare(candidateAnswer.toLowerCase().trim(), this.securityQuestion.answer);
+};
+
+// Check if user is admin
+userSchema.methods.isAdmin = function() {
+    return this.role === 'admin';
 };
 
 // Add indexes for better performance (email and uniqueId already have unique: true)
