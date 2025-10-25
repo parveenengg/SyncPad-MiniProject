@@ -27,6 +27,13 @@ const login = async (req, res) => {
     try {
         console.log('Login attempt:', { email: req.body.email, hasPassword: !!req.body.password });
         console.log('MongoDB connection state:', mongoose.connection.readyState);
+        
+        // Check if database is connected
+        if (mongoose.connection.readyState !== 1) {
+            console.error('Database not connected. State:', mongoose.connection.readyState);
+            return res.render('login', { error: 'Database connection error. Please try again.' });
+        }
+        
         const { email, password } = req.body;
         
         // Input validation
@@ -81,6 +88,14 @@ const login = async (req, res) => {
 const signup = async (req, res) => {
     try {
         console.log('Signup attempt:', { email: req.body.email, hasPassword: !!req.body.password, name: req.body.name });
+        console.log('MongoDB connection state:', mongoose.connection.readyState);
+        
+        // Check if database is connected
+        if (mongoose.connection.readyState !== 1) {
+            console.error('Database not connected. State:', mongoose.connection.readyState);
+            return res.render('signup', { error: 'Database connection error. Please try again.' });
+        }
+        
         const { email, password, name } = req.body;
         
         // Input validation
