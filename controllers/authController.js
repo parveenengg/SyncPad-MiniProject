@@ -31,6 +31,8 @@ const login = async (req, res) => {
         // Check if database is connected
         if (mongoose.connection.readyState !== 1) {
             console.error('Database not connected. State:', mongoose.connection.readyState);
+            console.error('MONGODB_URI exists:', !!process.env.MONGODB_URI);
+            console.error('MONGODB_URI value:', process.env.MONGODB_URI ? 'SET' : 'NOT SET');
             return res.render('login', { error: 'Database connection error. Please try again.' });
         }
         
@@ -93,6 +95,8 @@ const signup = async (req, res) => {
         // Check if database is connected
         if (mongoose.connection.readyState !== 1) {
             console.error('Database not connected. State:', mongoose.connection.readyState);
+            console.error('MONGODB_URI exists:', !!process.env.MONGODB_URI);
+            console.error('MONGODB_URI value:', process.env.MONGODB_URI ? 'SET' : 'NOT SET');
             return res.render('signup', { error: 'Database connection error. Please try again.' });
         }
         
