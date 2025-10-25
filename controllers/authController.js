@@ -222,19 +222,23 @@ const requireAuth = (req, res, next) => {
 // Handle forgot password
 const forgotPassword = async (req, res) => {
     try {
-        const { email } = req.body;
+        const { email, securityAnswer, newPassword } = req.body;
         
         if (!email) {
             return res.render('forgot-password', { 
                 error: 'Email is required',
-                success: null 
+                success: null,
+                showSecurityQuestion: false,
+                user: null
             });
         }
         
         if (!email.includes('@') || email.length < 5) {
             return res.render('forgot-password', { 
                 error: 'Please enter a valid email address',
-                success: null 
+                success: null,
+                showSecurityQuestion: false,
+                user: null
             });
         }
         
@@ -243,22 +247,93 @@ const forgotPassword = async (req, res) => {
         if (!user) {
             return res.render('forgot-password', { 
                 error: 'No account found with this email address',
-                success: null 
+                success: null,
+                showSecurityQuestion: false,
+                user: null
             });
         }
         
-        // For now, just show a success message
-        // In a real application, you would send an email with reset instructions
+        // If no security question is set up, show error
+        if (!user.securityQuestion || !user.securityQuestion.question) {
+            return res.render('forgot-password', { 
+                error: 'No security question set up for this account. Please contact support.',
+                success: null,
+                showSecurityQuestion: false,
+                user: null
+            });
+        }
+        
+        // If security answer is provided, verify it
+        if (securityAnswer) {
+            const isCorrect = await user.compareSecurityAnswer(securityAnswer);
+            if (!isCorrect) {
+                return res.render('forgot-password', { 
+                    error: 'Incorrect security answer. Please try again.',
+                    success: null,
+                    showSecurityQuestion: true,
+                    user: {
+                        email: user.email,
+                        securityQuestion: user.securityQuestion.question
+                    }
+                });
+            }
+            
+            // If new password is provided, update it
+            if (newPassword) {
+                if (newPassword.length < 6) {
+                    return res.render('forgot-password', { 
+                        error: 'New password must be at least 6 characters long.',
+                        success: null,
+                        showSecurityQuestion: true,
+                        user: {
+                            email: user.email,
+                            securityQuestion: user.securityQuestion.question
+                        }
+                    });
+                }
+                
+                user.password = newPassword;
+                await user.save();
+                
+                return res.render('forgot-password', { 
+                    error: null,
+                    success: 'Password has been reset successfully! You can now login with your new password.',
+                    showSecurityQuestion: false,
+                    user: null
+                });
+            }
+            
+            // Show password reset form
+            return res.render('forgot-password', { 
+                error: null,
+                success: null,
+                showSecurityQuestion: true,
+                showPasswordForm: true,
+                user: {
+                    email: user.email,
+                    securityQuestion: user.securityQuestion.question
+                }
+            });
+        }
+        
+        // Show security question
         return res.render('forgot-password', { 
             error: null,
-            success: 'Password reset instructions have been sent to your email address. Please check your inbox.'
+            success: null,
+            showSecurityQuestion: true,
+            user: {
+                email: user.email,
+                securityQuestion: user.securityQuestion.question
+            }
         });
         
     } catch (error) {
         console.error('Forgot password error:', error);
         return res.render('forgot-password', { 
             error: 'An error occurred. Please try again.',
-            success: null 
+            success: null,
+            showSecurityQuestion: false,
+            user: null
         });
     }
 };

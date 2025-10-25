@@ -40,7 +40,12 @@ router.get('/logout', logout);
 
 // Forgot password route
 router.get('/forgot-password', (req, res) => {
-    res.render('forgot-password', { error: null, success: null });
+    res.render('forgot-password', { 
+        error: null, 
+        success: null,
+        showSecurityQuestion: false,
+        user: null
+    });
 });
 router.post('/forgot-password', authLimiter, forgotPassword);
 
