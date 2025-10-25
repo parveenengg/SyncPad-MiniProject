@@ -32,17 +32,9 @@ const adminLogin = asyncHandler(async (req, res) => {
         return res.render('admin-login', { error: 'Invalid admin credentials' });
     }
 
-    // Check if account is locked
-    if (admin.isLocked) {
-        return res.render('admin-login', { 
-            error: 'Account is temporarily locked due to too many failed attempts' 
-        });
-    }
-
     // Check password
     const isMatch = await admin.comparePassword(password);
     if (!isMatch) {
-        await admin.incLoginAttempts();
         logger.logSecurity('ADMIN_LOGIN_FAILED', {
             email,
             ip: req.ip,
@@ -50,12 +42,6 @@ const adminLogin = asyncHandler(async (req, res) => {
         });
         return res.render('admin-login', { error: 'Invalid admin credentials' });
     }
-
-    // Reset login attempts on successful login
-    await admin.resetLoginAttempts();
-
-    // Update online status
-    await admin.updateOnlineStatus(true);
 
     // Set admin session
     req.session.adminId = admin._id;
@@ -76,58 +62,19 @@ const adminLogin = asyncHandler(async (req, res) => {
 const getAdminDashboard = asyncHandler(async (req, res) => {
     // Get user statistics
     const totalUsers = await User.countDocuments({ role: 'user' });
-    const activeUsers = await User.countDocuments({ isOnline: true });
     const totalAdmins = await User.countDocuments({ role: { $in: ['admin', 'super_admin'] } });
-    
-    // Get storage statistics
-    const users = await User.find({ role: 'user' }).select('storageUsage name email');
-    
-    // Calculate total storage usage
-    let totalStorageBytes = 0;
-    let topStorageUsers = [];
-    
-    for (let user of users) {
-        // Calculate storage if not recently calculated
-        if (!user.storageUsage.lastCalculated || 
-            Date.now() - user.storageUsage.lastCalculated > 24 * 60 * 60 * 1000) {
-            await user.calculateStorageUsage();
-        }
-        
-        totalStorageBytes += user.storageUsage.totalBytes;
-        
-        topStorageUsers.push({
-            name: user.name,
-            email: user.email,
-            storageBytes: user.storageUsage.totalBytes,
-            formattedStorage: user.getFormattedStorageUsage(),
-            notesCount: user.storageUsage.notesCount
-        });
-    }
-    
-    // Sort by storage usage
-    topStorageUsers.sort((a, b) => b.storageBytes - a.storageBytes);
-    topStorageUsers = topStorageUsers.slice(0, 10); // Top 10 users
     
     // Get recent activity
     const recentUsers = await User.find({ role: 'user' })
         .sort({ lastLogin: -1 })
         .limit(10)
-        .select('name email lastLogin isOnline');
+        .select('name email lastLogin');
     
     // Get note statistics
     const totalNotes = await Note.countDocuments();
     const publicNotes = await Note.countDocuments({ isPublic: true });
     const encryptedNotes = await Note.countDocuments({ encrypted: true });
     
-    // Format total storage
-    const formatBytes = (bytes) => {
-        if (bytes === 0) return '0 Bytes';
-        const k = 1024;
-        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-        const i = Math.floor(Math.log(bytes) / Math.log(k));
-        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-    };
-
     logger.logUserAction(req.session.adminId, 'ADMIN_DASHBOARD_ACCESS', {
         adminEmail: req.session.adminEmail
     });
@@ -140,14 +87,11 @@ const getAdminDashboard = asyncHandler(async (req, res) => {
         },
         stats: {
             totalUsers,
-            activeUsers,
             totalAdmins,
             totalNotes,
             publicNotes,
-            encryptedNotes,
-            totalStorage: formatBytes(totalStorageBytes)
+            encryptedNotes
         },
-        topStorageUsers,
         recentUsers
     });
 });
@@ -199,12 +143,7 @@ const getAllUsers = asyncHandler(async (req, res) => {
             name: user.name,
             email: user.email,
             role: user.role,
-            isOnline: user.isOnline,
-            lastSeen: user.lastSeen,
             lastLogin: user.lastLogin,
-            isActive: user.isActive,
-            storageUsage: user.getFormattedStorageUsage(),
-            notesCount: user.storageUsage.notesCount,
             createdAt: user.createdAt
         })),
         pagination: {
