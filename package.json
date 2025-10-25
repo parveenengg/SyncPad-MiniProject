@@ -9,7 +9,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "echo 'No build step required for Node.js'",
     "deploy:heroku": "git push heroku main",
-    "deploy:vercel": "vercel --prod"
+    "deploy:vercel": "vercel --prod",
+    "vercel-build": "echo 'No build step required for Vercel'"
   },
   "keywords": [],
   "author": "",
