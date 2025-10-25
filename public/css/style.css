@@ -1,11 +1,5 @@
 /* SyncPad Mini Project - Main Styles */
 
-/* Import component styles */
-@import url('./navbar.css');
-@import url('./main-content.css');
-@import url('./footer.css');
-@import url('./forms.css');
-
 /* Global styles */
 body {
     font-family: 'Inter', 'Helvetica', Arial, sans-serif;

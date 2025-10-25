@@ -65,8 +65,13 @@ app.use(limiter);
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(express.json({ limit: '10mb' }));
 
-// Static files
-app.use(express.static('public'));
+// Static files - serve from public directory
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Debug static file serving
+app.use('/css', express.static(path.join(__dirname, 'public/css')));
+app.use('/js', express.static(path.join(__dirname, 'public/js')));
+app.use('/images', express.static(path.join(__dirname, 'public/images')));
 
 // Session middleware
 app.use(session({
