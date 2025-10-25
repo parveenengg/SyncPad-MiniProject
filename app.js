@@ -8,7 +8,7 @@ const noteRoutes = require('./routes/noteRoutes');
 const authRoutes = require('./routes/authRoutes');
 
 const app = express();
-const PORT = 3330;
+const PORT = process.env.PORT || 3330;
 
 // Connect to MongoDB
 connectDB();
@@ -75,6 +75,6 @@ app.use((err, req, res, next) => {
 
 // Start server
 app.listen(PORT, () => {
-    console.log(`Server running at http://localhost:${PORT}`);
+    console.log(`Server running on port ${PORT}`);
     console.log('Connected to MongoDB');
 });
