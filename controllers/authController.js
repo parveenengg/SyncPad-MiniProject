@@ -88,12 +88,6 @@ const login = async (req, res) => {
                 console.error('Session save error:', err);
                 return res.render('login', { error: 'Session error. Please try again.' });
             }
-            console.log('Session saved, redirecting to /home');
-            console.log('Session data before redirect:', {
-                userId: req.session.userId,
-                userEmail: req.session.userEmail,
-                userName: req.session.userName
-            });
             res.redirect('/home');
         });
     } catch (error) {
@@ -214,18 +208,9 @@ const logout = (req, res) => {
 
 // Middleware to check if user is authenticated
 const requireAuth = (req, res, next) => {
-    console.log('requireAuth check:', {
-        hasSession: !!req.session,
-        userId: req.session?.userId,
-        userEmail: req.session?.userEmail,
-        userName: req.session?.userName
-    });
-    
     if (req.session && req.session.userId) {
-        console.log('User authenticated, proceeding to next middleware');
         return next();
     } else {
-        console.log('User not authenticated, redirecting to login');
         res.redirect('/login');
     }
 };
@@ -235,67 +220,152 @@ const forgotPassword = async (req, res) => {
     try {
         const { email, securityAnswer, newPassword } = req.body;
         
-        if (!email || !securityAnswer) {
-            return res.render('forgot-password', { 
-                error: 'Email and security answer are required',
-                success: null,
-                showSecurityQuestion: false,
-                user: null
-            });
-        }
-        
-        if (!email.includes('@') || email.length < 5) {
-            return res.render('forgot-password', { 
-                error: 'Please enter a valid email address',
-                success: null,
-                showSecurityQuestion: false,
-                user: null
-            });
-        }
-        
-        // Check if user exists
-        const user = await User.findOne({ email: email.toLowerCase() });
-        if (!user) {
-            return res.render('forgot-password', { 
-                error: 'No account found with this email address',
-                success: null,
-                showSecurityQuestion: false,
-                user: null
-            });
-        }
-        
-        // If no security question is set up, show error
-        if (!user.securityQuestion || !user.securityQuestion.question) {
-            return res.render('forgot-password', { 
-                error: 'No security question set up for this account. Please contact support.',
-                success: null,
-                showSecurityQuestion: false,
-                user: null
-            });
-        }
-        
-        // Verify security answer
-        const isCorrect = await user.compareSecurityAnswer(securityAnswer);
-        if (!isCorrect) {
-            return res.render('forgot-password', { 
-                error: 'Incorrect security answer. Please try again.',
-                success: null,
-                showSecurityQuestion: false,
-                user: null
-            });
-        }
-        
-        // If new password is provided, update it
-        if (newPassword) {
-            if (newPassword.length < 6) {
+        // Step 1: Email verification
+        if (email && !securityAnswer && !newPassword) {
+            if (!email.includes('@') || email.length < 5) {
                 return res.render('forgot-password', { 
-                    error: 'New password must be at least 6 characters long.',
+                    error: 'Please enter a valid email address',
                     success: null,
                     showSecurityQuestion: false,
                     user: null
                 });
             }
             
+            // Check if user exists
+            const user = await User.findOne({ email: email.toLowerCase() });
+            if (!user) {
+                return res.render('forgot-password', { 
+                    error: 'No account found with this email address',
+                    success: null,
+                    showSecurityQuestion: false,
+                    user: null
+                });
+            }
+            
+            // If no security question is set up, show error
+            if (!user.securityQuestion || !user.securityQuestion.question) {
+                return res.render('forgot-password', { 
+                    error: 'No security question set up for this account. Please contact support.',
+                    success: null,
+                    showSecurityQuestion: false,
+                    user: null
+                });
+            }
+            
+            // Show security question
+            return res.render('forgot-password', { 
+                error: null,
+                success: null,
+                showSecurityQuestion: true,
+                showPasswordForm: false,
+                user: {
+                    email: user.email,
+                    securityQuestion: user.securityQuestion.question
+                }
+            });
+        }
+        
+        // Step 2: Security answer verification
+        if (email && securityAnswer && !newPassword) {
+            if (!email || !securityAnswer) {
+                return res.render('forgot-password', { 
+                    error: 'Email and security answer are required',
+                    success: null,
+                    showSecurityQuestion: false,
+                    user: null
+                });
+            }
+            
+            // Check if user exists
+            const user = await User.findOne({ email: email.toLowerCase() });
+            if (!user) {
+                return res.render('forgot-password', { 
+                    error: 'No account found with this email address',
+                    success: null,
+                    showSecurityQuestion: false,
+                    user: null
+                });
+            }
+            
+            // Verify security answer
+            const isCorrect = await user.compareSecurityAnswer(securityAnswer);
+            if (!isCorrect) {
+                return res.render('forgot-password', { 
+                    error: 'Incorrect security answer. Please try again.',
+                    success: null,
+                    showSecurityQuestion: true,
+                    showPasswordForm: false,
+                    user: {
+                        email: user.email,
+                        securityQuestion: user.securityQuestion.question
+                    }
+                });
+            }
+            
+            // Show password reset form after successful security answer verification
+            return res.render('forgot-password', { 
+                error: null,
+                success: 'Security question verified! Please enter your new password.',
+                showSecurityQuestion: true,
+                showPasswordForm: true,
+                user: {
+                    email: user.email,
+                    securityQuestion: user.securityQuestion.question
+                }
+            });
+        }
+        
+        // Step 3: Password reset
+        if (email && securityAnswer && newPassword) {
+            if (!email || !securityAnswer || !newPassword) {
+                return res.render('forgot-password', { 
+                    error: 'All fields are required',
+                    success: null,
+                    showSecurityQuestion: false,
+                    user: null
+                });
+            }
+            
+            if (newPassword.length < 6) {
+                return res.render('forgot-password', { 
+                    error: 'New password must be at least 6 characters long.',
+                    success: null,
+                    showSecurityQuestion: true,
+                    showPasswordForm: true,
+                    user: {
+                        email: email,
+                        securityQuestion: 'Your security question'
+                    }
+                });
+            }
+            
+            // Check if user exists
+            const user = await User.findOne({ email: email.toLowerCase() });
+            if (!user) {
+                return res.render('forgot-password', { 
+                    error: 'No account found with this email address',
+                    success: null,
+                    showSecurityQuestion: false,
+                    user: null
+                });
+            }
+            
+            // Verify security answer again
+            const isCorrect = await user.compareSecurityAnswer(securityAnswer);
+            if (!isCorrect) {
+                return res.render('forgot-password', { 
+                    error: 'Incorrect security answer. Please try again.',
+                    success: null,
+                    showSecurityQuestion: true,
+                    showPasswordForm: true,
+                    user: {
+                        email: user.email,
+                        securityQuestion: user.securityQuestion.question
+                    }
+                });
+            }
+            
+            // Update password
             user.password = newPassword;
             await user.save();
             
@@ -307,16 +377,12 @@ const forgotPassword = async (req, res) => {
             });
         }
         
-        // Show password reset form after successful security answer verification
+        // Default case - show email form
         return res.render('forgot-password', { 
             error: null,
-            success: 'Security question verified! Please enter your new password.',
-            showSecurityQuestion: true,
-            showPasswordForm: true,
-            user: {
-                email: user.email,
-                securityQuestion: user.securityQuestion.question
-            }
+            success: null,
+            showSecurityQuestion: false,
+            user: null
         });
         
     } catch (error) {
