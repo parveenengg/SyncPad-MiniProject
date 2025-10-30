@@ -8,7 +8,7 @@
 </head>
 <body>
     <div class="container">
-        <div class="error-page">
+        <div class="error-page content-with-footer">
             <h1>Oops! Something went wrong</h1>
             <p><%= error %></p>
             <div class="error-actions">
@@ -22,11 +22,7 @@
         </div>
         
         <!-- Footer -->
-        <footer class="px-10 py-8 bg-gray-800 text-white">
-            <div class="max-w-6xl mx-auto text-center">
-                <p class="text-gray-400">© 2024 SyncPad Mini Project. Built with ❤️ for collaborative note-taking.</p>
-            </div>
-        </footer>
+        <%- include('partials/footer') %>
     </div>
 </body>
 </html>

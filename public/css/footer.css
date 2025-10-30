@@ -1,0 +1,57 @@
+/* ========================================
+   FOOTER STYLES
+   ========================================
+   Consistent footer styling across all pages
+*/
+
+/* Footer positioning and styling */
+.footer-fixed {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 10;
+    background-color: #1f2937; /* gray-800 */
+    color: white;
+    padding: 1.5rem 2.5rem; /* py-6 px-10 */
+    box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.1), 0 -2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+/* Responsive padding for mobile */
+@media (max-width: 768px) {
+    .footer-fixed {
+        padding: 1rem 1rem; /* py-4 px-4 */
+    }
+}
+
+/* Content spacing to prevent footer overlap */
+.content-with-footer {
+    padding-bottom: 6rem; /* pb-24 - 96px */
+}
+
+/* Mobile content spacing */
+@media (max-width: 768px) {
+    .content-with-footer {
+        padding-bottom: 5rem; /* pb-20 - 80px */
+    }
+}
+
+/* Footer text styling */
+.footer-text {
+    color: #9ca3af; /* text-gray-400 */
+    font-size: 0.875rem; /* text-sm */
+    line-height: 1.25rem;
+}
+
+@media (min-width: 768px) {
+    .footer-text {
+        font-size: 1rem; /* text-base on md and up */
+    }
+}
+
+/* Footer container */
+.footer-container {
+    max-width: 72rem; /* max-w-6xl */
+    margin: 0 auto;
+    text-align: center;
+}
