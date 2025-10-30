@@ -13,9 +13,25 @@ const {
     toggleSharing
 } = require('../controllers/noteController');
 const { requireAuth } = require('../controllers/authController');
+// ========================================
+// EJS ROUTES
+// ========================================
 
-// Home route
-router.get('/home', requireAuth, getDashboard); // Keep for backward compatibility
+// EJS Home route (fallback)
+router.get('/home', requireAuth, getDashboard);
+
+// EJS Create page (fallback)
+router.get('/create', requireAuth, getCreatePage);
+
+// EJS Note view (fallback)
+router.get('/note/:id', getNote);
+
+// EJS Edit page (fallback)
+router.get('/edit/:id', requireAuth, getEditPage);
+
+// ========================================
+// LEGACY ROUTES (for backward compatibility)
+// ========================================
 
 // Dashboard route (redirects to home)
 router.get('/collaborators', requireAuth, (req, res) => {
@@ -25,20 +41,11 @@ router.get('/collaborators', requireAuth, (req, res) => {
 // Notes listing route
 router.get('/notes', requireAuth, getAllNotes);
 
-// Create page
-router.get('/create', requireAuth, getCreatePage);
-
 // Create new note
 router.post('/createnote', requireAuth, createNote);
 
-// Get single note
-router.get('/note/:id', getNote);
-
 // Get shared note by token
 router.get('/shared/:token', getSharedNote);
-
-// Get edit page
-router.get('/edit/:id', requireAuth, getEditPage);
 
 // Update note
 router.post('/update/:id', requireAuth, updateNote);

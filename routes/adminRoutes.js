@@ -20,12 +20,25 @@ const adminLimiter = rateLimit({
     legacyHeaders: false,
 });
 
-// Admin login routes (no authentication required)
+// ========================================
+// ADMIN LOGIN ROUTES (no authentication required)
+// ========================================
 router.get('/', getAdminLoginPage);
 router.post('/login', adminLimiter, adminLogin);
 
-// Admin dashboard routes (require admin authentication)
-router.get('/home', requireAdmin, getAdminDashboard);
+// ========================================
+// EJS ADMIN ROUTES
+// ========================================
+
+// EJS Monitor route (fallback)
+router.get('/monitor', requireAdmin, getAdminDashboard);
+
+// Legacy admin home route (redirects to monitor)
+router.get('/home', requireAdmin, (req, res) => {
+    res.redirect('/monitor');
+});
+
+// Admin users management
 router.get('/users', requireAdmin, getAllUsers);
 router.post('/users/:userId/status', requireAdmin, updateUserStatus);
 router.get('/logout', adminLogout);
